@@ -1,0 +1,25 @@
+name: imaris
+
+channels:
+  - defaults
+  - simpleitk
+  - conda-forge
+dependencies:
+  - python=3.7.0 #Python version supported by imaris
+  - SimpleITK>=2.0.0
+  - numpy
+  - pandas
+  - h5py>=2.10.0
+  - PySide2
+  - openpyxl
+  - docutils #used for converting rst to html (see help_dialog.py)
+  - pygments #used for code highlighting (see help_dialog.py)
+  - matplotlib
+  - spyder #only used for development, editor
+  - pytest #only used for development, testing
+  - flake8 #only used for development, test code formatting
+  - pip
+  - pip:
+    - https://github.com/niaid/sitk-ibex/releases/download/v0.3/sitkibex-0.3-py3-none-any.whl #sitk-ibex registration
+    - QDarkStyle #dark stylesheet for Qt applications
+    - black #only used for development, code formatting
