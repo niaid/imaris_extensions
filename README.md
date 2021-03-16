@@ -53,3 +53,4 @@ pip install requirements.txt
 
 ### SimpleITK
  1. XTRegisterSameChannel - Registration of 2D or 3D images that share a common channel (correlation based affine alignment).
+ 2. XTChannelArithmetic.py - Perform channel arithmetic, and more advanced channel manipulations via short SimpleITK expressions (short SimpleITK programs).
