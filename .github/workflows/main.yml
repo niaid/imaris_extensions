@@ -7,11 +7,13 @@ on:
     branches: [ main ]
 
 jobs:
+
   # linting and checking for secrets is only done once
   # no need for multi platform/Python versions.
   preliminary_test:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Set up Python 3.7
       uses: actions/setup-python@v2
       with:
@@ -65,4 +67,36 @@ jobs:
     - name: Test with pytest
       run: |
         python -m pytest
- 
+
+  documentation:
+    # only run if this workflow was triggered by a push event on main branch
+    # either direct push to main or a merged pull request which also generates
+    # a push event.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_dev.txt
+    - name: Install pandoc
+      run: |
+        sudo apt-get install pandoc
+    - name: Update documentation
+      run: |
+        python docs/generate_documentation.py
+        git checkout -b gh-pages origin/gh-pages
+        git config --local user.email "$(git log --format='%ae' HEAD^!)"
+        git config --local user.name "$(git log --format='%an' HEAD^!)"
+        mv -f docs/*.html .
+        git add *.html
+        git commit --amend --no-edit
+        git push origin gh-pages --force
