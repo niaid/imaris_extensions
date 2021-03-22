@@ -1,4 +1,4 @@
-## SimpleITK Imaris Extensions
+## Overview
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) &nbsp;&nbsp;
 ![ubuntu / macos / windows (Python 3.7, 3.8)](https://github.com/niaid/imaris_extensions/actions/workflows/main.yml/badge.svg)
@@ -7,7 +7,21 @@ This repository contains extensions, plugins, for the [Imaris](https://imaris.ox
 
 The extensions are designed so that they can be run either as independent programs or via the Imaris extension mechanism. When run as independent programs they can be used on any of the standard operating systems (Windows/OSX/Linux).
 
-**Note**: As the testing data is rather large, we use [git-lfs](https://git-lfs.github.com/). To obtain the data using standard git commands you will have to install git-lfs on your system.
+Software development notes:
+
+1. We use the [black code formatter](https://github.com/psf/black) to ensure uniform code style.
+2. The code is tested on Linux/OSX/Windows with Python versions 3.7 and 3.8.
+3. As the testing data is rather large, we use [git-lfs](https://git-lfs.github.com/). To obtain the data using standard git commands you will have to install git-lfs on your system.
+
+## Extensions Listing
+
+### SimpleITK
+  1. [XTRegisterSameChannel](http://niaid.github.io/imaris_extensions/XTRegisterSameChannel.html) - Registration of 2D or 3D images that share a common channel (correlation based affine alignment).
+  2. [XTChannelArithmetic](http://niaid.github.io/imaris_extensions/XTChannelArithmetic.html) - Perform channel arithmetic, and more advanced channel manipulations via short SimpleITK expressions (short SimpleITK programs).
+  3. More to come.
+
+### Utilities
+  1. More to come.  
 
 ## Setup
 
@@ -39,18 +53,12 @@ pip install requirements.txt
   **OSX/Linux**: `run_extensions.sh`
 
 5. Run the relevant script:  
- **Windows**: double click the `run_extensions.bat`.  
 
- **OSX/Linux**: from a terminal, make the script executable `chmod +x run_extensions.sh` and run it `./run_extensions.sh`.  
+   **Windows**: double click the `run_extensions.bat`.  
 
- **Bonus**: On OSX, you can configure things so that double clicking the script in Finder will run it. In Finder,
- 1. Right-click the run_extensions.sh file and select "Open with" and then "Other..."
- 2. Change the "Enable" dropdown menu from "Recommended Applications" to "All Applications".
- 3. Search for "Terminal" and select it (check the "Always Open With" if you want all shell scripts to be run via terminal, otherwise leave it unchecked).
+   **OSX/Linux**: from a terminal, make the script executable `chmod +x run_extensions.sh` and run it `./run_extensions.sh`.  
 
-
- ## Extensions Overview
-
-### SimpleITK
- 1. XTRegisterSameChannel - Registration of 2D or 3D images that share a common channel (correlation based affine alignment).
- 2. XTChannelArithmetic.py - Perform channel arithmetic, and more advanced channel manipulations via short SimpleITK expressions (short SimpleITK programs).
+   **Bonus**: On OSX, you can configure things so that double clicking the script in Finder will run it. In Finder,  
+   1. Right-click the run_extensions.sh file and select "Open with" and then "Other..."
+   2. Change the "Enable" dropdown menu from "Recommended Applications" to "All Applications".
+   3. Search for "Terminal" and select it (check the "Always Open With" if you want all shell scripts to be run via terminal, otherwise leave it unchecked).
