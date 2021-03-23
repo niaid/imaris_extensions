@@ -13,6 +13,16 @@ Software development notes:
 2. The code is tested on Linux/OSX/Windows with Python versions 3.7 and 3.8.
 3. As the testing data is rather large, we use [git-lfs](https://git-lfs.github.com/). To obtain the data using standard git commands you will have to install git-lfs on your system.
 
+## Download
+
+1. Dowload code as [zip file](https://github.com/niaid/imaris_extensions/archive/refs/heads/main.zip).
+2. Download documentation as [zip file](https://github.com/niaid/imaris_extensions/archive/refs/heads/gh-pages.zip).
+3. Download repository using git:
+
+  ```
+  git clone https://github.com/niaid/imaris_extensions.git
+  ```
+
 ## Extensions Listing
 
 ### SimpleITK
