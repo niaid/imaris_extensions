@@ -98,7 +98,5 @@ jobs:
         git config --local user.name "$(git log --format='%an' HEAD^!)"
         mv -f docs/*.html .
         git add *.html
-        touch .nojekyll
-        git add .nojekyll
         git commit --amend --no-edit
         git push origin gh-pages --force
