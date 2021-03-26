@@ -651,6 +651,7 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
             self.correlation_cb_layout.addWidget(
                 QCheckBox(self.registration_channel_combo.itemText(i))
             )
+            self.correlation_cb_layout.itemAt(i).widget().setChecked(True)
 
     def __compute_correlations(self):
         self.restart_button.setEnabled(False)
