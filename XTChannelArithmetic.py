@@ -21,7 +21,7 @@
 # create masks for selecting subregions in channels.
 #    <CustomTools>
 #      <Menu>
-#      <Submenu name="SimpleITK">
+#      <Submenu name="SimpleITK Algorithms">
 #       <Item name="Channel Arithmetic" icon="Python3" tooltip="Perform arithmetic operations using channels.">
 #         <Command>Python3XT::XTChannelArithmetic(%i)</Command>
 #       </Item>
