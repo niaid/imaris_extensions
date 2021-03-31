@@ -17,7 +17,7 @@ Software development notes:
 
 1. Dowload code as [zip file](https://github.com/niaid/imaris_extensions/archive/refs/heads/main.zip).
 2. Download documentation as [zip file](https://github.com/niaid/imaris_extensions/archive/refs/heads/gh-pages.zip).
-3. Download repository using git:
+3. Clone repository using git (with GitHub account):
 
   ```
   git clone https://github.com/niaid/imaris_extensions.git
@@ -25,13 +25,14 @@ Software development notes:
 
 ## Extensions Listing
 
-### SimpleITK
+### Algorithms
   1. [XTRegisterSameChannel](http://niaid.github.io/imaris_extensions/XTRegisterSameChannel.html) - Registration of 2D or 3D images that share a common channel (correlation based affine alignment).
   2. [XTChannelArithmetic](http://niaid.github.io/imaris_extensions/XTChannelArithmetic.html) - Perform channel arithmetic, and more advanced channel manipulations via short SimpleITK expressions (short SimpleITK programs).
   3. More to come.
 
 ### Utilities
-  1. More to come.  
+  1. [XTConfigureChannelSettings](http://niaid.github.io/imaris_extensions/XTConfigureChannelSettings.html) - Configure channel settings, name, description and visualization configuration specified via a csv file or an Imaris file.
+  2. More to come.
 
 ## Setup
 
