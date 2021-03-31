@@ -22,7 +22,7 @@
 #
 #    <CustomTools>
 #      <Menu>
-#      <Submenu name="SimpleITK">
+#      <Submenu name="SimpleITK Algorithms">
 #       <Item name="Affine registration of z-stacks using common channel" icon="Python3" tooltip="Affine registration of z-stacks using correlation of common channel.">  # noqa: E501
 #         <Command>Python3XT::XTRegisterSameChannel(%i)</Command>
 #       </Item>
