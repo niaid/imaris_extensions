@@ -11,6 +11,7 @@ extensions_information = [
     for f, a in [
         ("../XTChannelArithmetic.py", "ChannelArithmeticDialog"),
         ("../XTRegisterSameChannel.py", "RegisterSameChannelDialog"),
+        ("../XTConfigureChannelSettings.py", "ConfigureChannelSettingsDialog"),
     ]
 ]
 
