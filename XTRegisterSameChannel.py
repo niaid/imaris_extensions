@@ -90,15 +90,17 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
     Register Multiple Images Using a Common Channel
     ===============================================
 
-    This program allows you to register multiple images using affine transformations
-    and requires that there be a common channel across all images. Registration is
+    This program allows you to register multiple images using **affine** transformations
+    and requires that there be a **common channel** across all images. Registration is
     based on maximization of correlation, hence the requirement for a common channel.
-    The program can be run either as an Imaris extension via the Imaris user interface
-    or as a standalone program.
+    The use of an affine transformation assumes that the images only undergo global
+    transformations, that is, they are rotated, translated, scaled possibly with differnt
+    scales per axis, and sheared. Local deformations are not accounted for.
 
-    The program supports registration of multi-channel
+    The program can be run either as an Imaris extension via the Imaris user interface
+    or as a standalone program. It supports registration of multi-channel
     z-stacks (a.k.a. 3D images, volumes) and multi-channel 2D images
-    (single slice z-stack).
+    (single slice z-stack). Sample datasets are freely availabe `on zenodo <https://doi.org/10.5281/zenodo.4632320>`_.
 
     The `source code for the registration <https://github.com/niaid/sitk-ibex>`_ is
     freely available on GitHub. This registration workflow was originally
