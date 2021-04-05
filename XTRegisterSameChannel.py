@@ -1011,6 +1011,24 @@ class RegisterImages(QThread):
                         samples_per_parameter=self.samples_per_parameter,
                         expand=self.expand_factor,
                     )
+                    # Because we are (ab)using the 3D registration framework to do
+                    # 2D affine registration, we need to account for the 3D nature
+                    # of 2D imaris images after the fact. That is, the z-misalignment
+                    # is ignored in the 2D registration and we account for it here.
+                    if not self.do_fft_initialization and not self.do_affine3d:
+                        z_align = sitk.TranslationTransform(3)
+                        z_align.SetOffset(
+                            [
+                                0,
+                                0,
+                                moving_image.GetOrigin()[2]
+                                - fixed_image.GetOrigin()[2],
+                            ]
+                        )
+                        self.registration_results[i] = sitk.CompositeTransform(
+                            [self.registration_results[i], z_align]
+                        )
+                        self.registration_results[i].FlattenTransform()
         # Use the stack trace as the error message to provide enough
         # detailes for debugging.
         except Exception:
