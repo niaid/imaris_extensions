@@ -188,6 +188,12 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
     doesn't succeed you can try modifying masking and samples per parameter or
     the selection of the fixed image.
 
+    **Note:** Imaris images, including 2D images, are positioned in 3D space. When performing
+    2D registration we check whether the slices are on the same z-plane (using SimpleITK epsilon).
+    In all cases the images are registered. If they are not on the same plane, a warning about this
+    is provided as part of the registration completion message. It is up to the user to decide whether
+    this is an issue or if this information can be ignored.
+
     """  # noqa
 
     def __init__(self):
@@ -203,12 +209,13 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
         )
 
         self.__create_gui()
-        self.__reset_gui()
+        self.__restart()
         self.setWindowTitle("Register Same Channel")
 
         # Connect to QThread's signals
         self.register_images.finished.connect(self.__registration_finished)
         self.register_images.processing_error.connect(self._processing_error_function)
+        self.register_images.warning2d.connect(self.__registration2d_warning_function)
 
         # Create a Handler for the sitkibex package logger, attached during
         # registration and detached afterwards
@@ -223,6 +230,9 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
         self.resample_images.processing_error.connect(self._processing_error_function)
         self.resample_images.update_state_signal.connect(self.status_bar.showMessage)
         self.show()
+
+    def __registration2d_warning_function(self):
+        self.registration2d_warning = True
 
     def __create_gui(self):
         # Advanced settings dialog
@@ -646,6 +656,7 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
     def __restart(self):
         self.__reset_gui()
         self.processing_error = False
+        self.registration2d_warning = False
         self.stack.setCurrentIndex(0)
 
     def __configure_and_show_correlation_analysis_widget(self):
@@ -863,7 +874,13 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
             json.dump(application_settings, fp)
 
         if not self.processing_error:
-            QMessageBox().information(self, "Message", "Registration completed.")
+            msg = "Registration completed."
+            if self.registration2d_warning:
+                msg = (
+                    msg
+                    + "\nWarning: The registered 2D images were not on the same z-plane."
+                )
+            QMessageBox().information(self, "Message", msg)
             self.resample_button.setEnabled(True)
 
     def __on_resample_progress(self, value):
@@ -934,6 +951,7 @@ class RegisterImages(QThread):
     """
 
     processing_error = Signal(str)
+    warning2d = Signal()
 
     def __init__(self):
         super(RegisterImages, self).__init__()
@@ -1029,6 +1047,16 @@ class RegisterImages(QThread):
                             [self.registration_results[i], z_align]
                         )
                         self.registration_results[i].FlattenTransform()
+                        # Use SimpleITK's epsilon to see if the 2D images are on
+                        # the same z plane.
+                        try:
+                            f = sitk.Image([1, 1, 1], sitk.sitkUInt8)
+                            f.SetOrigin([0, 0] + [fixed_image.GetOrigin()[2]])
+                            m = sitk.Image([1, 1, 1], sitk.sitkUInt8)
+                            m.SetOrigin([0, 0] + [moving_image.GetOrigin()[2]])
+                            f + m
+                        except Exception:
+                            self.warning2d.emit()
         # Use the stack trace as the error message to provide enough
         # detailes for debugging.
         except Exception:
