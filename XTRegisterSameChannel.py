@@ -192,7 +192,8 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
     2D registration we check whether the slices are on the same z-plane (using SimpleITK epsilon).
     In all cases the images are registered. If they are not on the same plane, a warning about this
     is provided as part of the registration completion message. It is up to the user to decide whether
-    this is an issue or if this information can be ignored.
+    this is an issue or if this information can be ignored. The resulting 2D image is positioned in
+    3D space using the z-plane of the fixed image.
 
     """  # noqa
 
