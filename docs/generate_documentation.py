@@ -12,6 +12,7 @@ extensions_information = [
         ("../XTChannelArithmetic.py", "ChannelArithmeticDialog"),
         ("../XTRegisterSameChannel.py", "RegisterSameChannelDialog"),
         ("../XTConfigureChannelSettings.py", "ConfigureChannelSettingsDialog"),
+        ("../XTExportChannelSettings.py", "ExportChannelSettingsDialog"),
     ]
 ]
 

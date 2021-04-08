@@ -3,7 +3,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) &nbsp;&nbsp;
 ![ubuntu / macos / windows (Python 3.7, 3.8)](https://github.com/niaid/imaris_extensions/actions/workflows/main.yml/badge.svg)
 
-This repository contains extensions, plugins, for the [Imaris](https://imaris.oxinst.com/) microscopy image analysis program. They either provide additional image analysis capabilities via the open source [SimpleITK](https://simpleitk.org) image analysis library, or are utilities that allow the user to easily modify meta-data associated with images stored in the Imaris file format (e.g. channel names, colors).
+This repository contains extensions, plugins, for the [Imaris](https://imaris.oxinst.com/) (Oxford Instruments) microscopy image analysis program. They either provide additional image analysis capabilities via the open source [SimpleITK](https://simpleitk.org) image analysis library, or are utilities that allow the user to easily modify meta-data associated with images stored in the Imaris file format (e.g. channel names, colors).
 
 The extensions are designed so that they can be run either as independent programs or via the Imaris extension mechanism. When run as independent programs they can be used on any of the standard operating systems (Windows/OSX/Linux).
 
@@ -32,7 +32,8 @@ Software development notes:
 
 ### Utilities
   1. [XTConfigureChannelSettings](http://niaid.github.io/imaris_extensions/XTConfigureChannelSettings.html) - Configure channel settings, name, description and visualization configuration specified via a csv file or an Imaris file.
-  2. More to come.
+  2. [XTExportChannelSettings](http://niaid.github.io/imaris_extensions/XTExportChannelSettings.html) - Export channel settings, name, description and visualization configuration to a csv file. The resulting csv file can be easily edited and then applied to other imaris files using the XTConfigureChannelSettings extension.
+  3. More to come.
 
 ## Setup
 

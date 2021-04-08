@@ -71,6 +71,7 @@ class ChannelArithmeticDialog(ieb.ImarisExtensionBase):
     """
     Channel Arithmetic and Beyond
     =============================
+    `View on GitHub <https://github.com/niaid/imaris_extensions>`_
 
     This program enables you to specify arithmetic expressions which are used to
     create new channels. The basic arithmetic operations are supported: +,-,*,/,**.
