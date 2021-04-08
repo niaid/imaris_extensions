@@ -69,6 +69,7 @@ class ConfigureChannelSettingsDialog(ieb.ImarisExtensionBase):
     """
     Configure Channel Settings
     ==========================
+    `View on GitHub <https://github.com/niaid/imaris_extensions>`_
 
     This program enables you to configure channel related settings for one or
     more files. The settings include:
@@ -120,6 +121,8 @@ class ConfigureChannelSettingsDialog(ieb.ImarisExtensionBase):
         250.920 250.920 247.095
         255.000 255.000 255.000
 
+    You can export a settings file in csv format from an imaris file using the
+    `Export Channel Settings extension  <http://niaid.github.io/imaris_extensions/XTExportChannelSettings.html>`_.
 
     **Note**: If there are fewer channels in the "settings" file, n, than in the
     file onto which the information is transferred,n<N, the final output dialog

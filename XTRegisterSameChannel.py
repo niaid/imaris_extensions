@@ -89,6 +89,7 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
     """
     Register Multiple Images Using a Common Channel
     ===============================================
+    `View on GitHub <https://github.com/niaid/imaris_extensions>`_
 
     This program allows you to register multiple images using **affine** transformations
     and requires that there be a **common channel** across all images. Registration is
