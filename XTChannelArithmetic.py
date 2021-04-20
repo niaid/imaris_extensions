@@ -515,6 +515,7 @@ class ArithmeticCalculator(QRunnable):
             self.signals.processing_error.emit(
                 "Exception occurred during computation:\n" + traceback.format_exc()
             )
+            self.signals.finished.emit()
 
     def process_vol_by_vol(self):
         meta_data = sio.read_metadata(self.input_file_name)

@@ -363,6 +363,28 @@ class TestIO:
                     ),
                 ],
             ),
+            (
+                "image_2D_two_channels_one_resolution_one_timepoint_corrupt_datasetinfo.ims",
+                [
+                    None,
+                    (
+                        "e2e221c7b8567835478a03f8b69f2a66",
+                        "5e4e3d0d621251bf3dd2122acc865a36",
+                    ),
+                    (
+                        "e2e221c7b8567835478a03f8b69f2a66",
+                        "5e4e3d0d621251bf3dd2122acc865a36",
+                    ),
+                    (
+                        "885b55612800cfab2b4265e1f36ba3a2",
+                        "ef48631d317aad901eef57185173b303",
+                    ),
+                    (
+                        "885b55612800cfab2b4265e1f36ba3a2",
+                        "ef48631d317aad901eef57185173b303",
+                    ),
+                ],
+            ),
         ],
     )
     def test_append_channels(self, file_name, results_md5, tmp_path):
