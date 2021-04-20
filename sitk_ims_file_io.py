@@ -1129,7 +1129,12 @@ def append_channels(sitk_image, file_name, time_index=0):
                     compression=existing_compression,
                     compression_opts=existing_compression_opts,
                 )
-        # Create the additional channels metadata groups that are expected to exist by the write_channels_metadata method.  # noqa: E501
+        # Create the additional channels metadata groups that are expected to
+        # exist by the write_channels_metadata method.
+        # We also accomodate for inconsistant imaris behavior where a channel
+        # was removed and the DataSetInfo group associated with the channel was
+        # not removed. In such a case, we won't try to create it as that will
+        # cause an exception.
         existing_number_of_channels_metadata = len(
             existing_image_metadata["channels_information"]
         )
@@ -1137,10 +1142,12 @@ def append_channels(sitk_image, file_name, time_index=0):
             existing_number_of_channels_metadata,
             number_of_channels + time_index_existing_number_of_channels,
         ):
-            f.create_group(
+            new_group_name = (
                 f.attrs["DataSetInfoDirectoryName"].tobytes().decode("UTF-8")
                 + f"/Channel {i}"
             )
+            if new_group_name not in f:
+                f.create_group(new_group_name)
 
     # We're adding channels that don't already have associated metadata, so add the metadata too
     if existing_number_of_channels_metadata < (
