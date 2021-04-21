@@ -50,6 +50,7 @@ from PySide2.QtWidgets import (
     QCheckBox,
     QProgressBar,
     QColorDialog,
+    QScrollArea,
 )
 from PySide2.QtCore import Qt, QObject, QRunnable, Signal, QThreadPool
 import qdarkstyle
@@ -288,8 +289,13 @@ class ChannelArithmeticDialog(ieb.ImarisExtensionBase):
         self.apply_button.clicked.connect(self.__channel_arithmetic_wrapper)
         arithmetic_layout.addWidget(self.apply_button)
 
+        progress_wid = QWidget()
         self.progress_grid_layout = QGridLayout()
-        arithmetic_layout.addLayout(self.progress_grid_layout)
+        progress_wid.setLayout(self.progress_grid_layout)
+        scroll_area = QScrollArea()
+        scroll_area.setWidget(progress_wid)
+        scroll_area.setWidgetResizable(True)
+        arithmetic_layout.addWidget(scroll_area)
 
         layout = QHBoxLayout()
         layout.setAlignment(Qt.AlignLeft)
