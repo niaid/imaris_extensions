@@ -1145,8 +1145,11 @@ def append_channels(sitk_image, file_name, time_index=0):
             new_group_name = (
                 f.attrs["DataSetInfoDirectoryName"].tobytes().decode("UTF-8")
                 + f"/Channel {i}"
-            )
-            if new_group_name not in f:
+            )  # Make the file consistent.
+            if new_group_name in f:
+                for a_name in f[new_group_name].attrs:
+                    del f[new_group_name].attrs[a_name]
+            else:
                 f.create_group(new_group_name)
 
     # We're adding channels that don't already have associated metadata, so add the metadata too
