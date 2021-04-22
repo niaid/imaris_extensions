@@ -73,7 +73,11 @@ is the common unit in SimpleITK."""
 
 unit_metadata_key = "unit"
 time_metadata_key = "times"
+# This is the time format used by most files, includes minutes, seconds and
+# microseconds (zero-padded on the left) in some rare cases the time does not
+# include the microseconds, so we have a "fallback"
 time_str_format = "%Y-%m-%d %H:%M:%S.%f"
+fallback_time_str_format = "%Y-%m-%d %H:%M:%S"
 channels_metadata_key = "imaris_channels_information"
 
 
@@ -146,16 +150,28 @@ def read_metadata(file_name):
                     .tobytes()
                 )
             )
-            meta_data_dict["times"] = [
-                datetime.datetime.strptime(
-                    f[dataset_info_dirname]["TimeInfo"]
-                    .attrs[f"TimePoint{i}"]
-                    .tobytes()
-                    .decode("UTF-8"),
-                    time_str_format,
-                )
-                for i in range(1, time_point_number + 1)
-            ]
+            meta_data_dict["times"] = []
+            for i in range(1, time_point_number + 1):
+                try:
+                    meta_data_dict["times"].append(
+                        datetime.datetime.strptime(
+                            f[dataset_info_dirname]["TimeInfo"]
+                            .attrs[f"TimePoint{i}"]
+                            .tobytes()
+                            .decode("UTF-8"),
+                            time_str_format,
+                        )
+                    )
+                except ValueError:
+                    meta_data_dict["times"].append(
+                        datetime.datetime.strptime(
+                            f[dataset_info_dirname]["TimeInfo"]
+                            .attrs[f"TimePoint{i}"]
+                            .tobytes()
+                            .decode("UTF-8"),
+                            fallback_time_str_format,
+                        )
+                    )
             meta_data_dict["unit"] = (
                 f[dataset_info_dirname]["Image"].attrs["Unit"].tobytes().decode("UTF-8")
             )
