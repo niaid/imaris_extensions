@@ -196,6 +196,13 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
     this is an issue or if this information can be ignored. The resulting 2D image is positioned in
     3D space using the z-plane of the fixed image.
 
+    2.5D Registration
+    +++++++++++++++++
+
+    In some rare cases you may want to register a z-stack using a 2.5D approach. That is, the z-stack
+    is projected along the z-direction using a mean projection, affine registration is performed in
+    2D and then the z-stacks are aligned in the z-direction so that their centers are aligned.
+
     """  # noqa
 
     def __init__(self):
@@ -218,6 +225,7 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
         self.register_images.finished.connect(self.__registration_finished)
         self.register_images.processing_error.connect(self._processing_error_function)
         self.register_images.warning2d.connect(self.__registration2d_warning_function)
+        self.register_images.warning3d.connect(self.__registration3d_warning_function)
 
         # Create a Handler for the sitkibex package logger, attached during
         # registration and detached afterwards
@@ -235,6 +243,9 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
 
     def __registration2d_warning_function(self):
         self.registration2d_warning = True
+
+    def __registration3d_warning_function(self):
+        self.registration3d_warning = True
 
     def __create_gui(self):
         # Advanced settings dialog
@@ -659,6 +670,7 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
         self.__reset_gui()
         self.processing_error = False
         self.registration2d_warning = False
+        self.registration3d_warning = False
         self.stack.setCurrentIndex(0)
 
     def __configure_and_show_correlation_analysis_widget(self):
@@ -882,6 +894,12 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
                     msg
                     + "\nWarning: The registered 2D images were not on the same z-plane."
                 )
+            if self.registration3d_warning:
+                msg = (
+                    msg
+                    + "\nWarning: The registered 3D images were registered using 2D affine"
+                    + " registration and then translated in z to center the stacks."
+                )
             QMessageBox().information(self, "Message", msg)
             self.resample_button.setEnabled(True)
 
@@ -954,6 +972,7 @@ class RegisterImages(QThread):
 
     processing_error = Signal(str)
     warning2d = Signal()
+    warning3d = Signal()
 
     def __init__(self):
         super(RegisterImages, self).__init__()
@@ -1011,6 +1030,7 @@ class RegisterImages(QThread):
             self.registration_results = [None] * len(
                 self.registration_channel_information
             )
+            single_slice = fixed_image.GetDepth() == 1
             self.registration_results[self.fixed_image_index] = sitk.Transform()
             for i, image_data in enumerate(self.registration_channel_information):
                 if i != self.fixed_image_index:
@@ -1031,34 +1051,48 @@ class RegisterImages(QThread):
                         samples_per_parameter=self.samples_per_parameter,
                         expand=self.expand_factor,
                     )
-                    # Because we are (ab)using the 3D registration framework to do
-                    # 2D affine registration, we need to account for the 3D nature
-                    # of 2D imaris images after the fact. That is, the z-misalignment
-                    # is ignored in the 2D registration and we account for it here.
-                    if not self.do_fft_initialization and not self.do_affine3d:
+                    # User specified that we only do 2D affine, the final results
+                    # depend on whether the input is a single slice or a volume.
+                    if (
+                        not self.do_fft_initialization
+                        and not self.do_affine3d
+                        and self.do_affine2d
+                    ):
+                        # Because we are (ab)using the 3D registration framework to do
+                        # 2D affine registration, we need to account for the 3D nature
+                        # of 2D imaris images after the fact. That is, the z-misalignment
+                        # is ignored in the 2D registration and we account for it here.
+                        if single_slice:
+                            ztrans = (
+                                moving_image.GetOrigin()[2] - fixed_image.GetOrigin()[2]
+                            )
+                            # Use SimpleITK's epsilon to see if the 2D images are on
+                            # the same z plane.
+                            try:
+                                f = sitk.Image([1, 1, 1], sitk.sitkUInt8)
+                                f.SetOrigin([0, 0] + [fixed_image.GetOrigin()[2]])
+                                m = sitk.Image([1, 1, 1], sitk.sitkUInt8)
+                                m.SetOrigin([0, 0] + [moving_image.GetOrigin()[2]])
+                                f + m
+                            except Exception:
+                                self.warning2d.emit()
+                        else:
+                            ztrans = (
+                                moving_image.TransformContinuousIndexToPhysicalPoint(
+                                    [0, 0, (moving_image.GetDepth() - 1) / 2.0]
+                                )[2]
+                                - fixed_image.TransformContinuousIndexToPhysicalPoint(
+                                    [0, 0, (fixed_image.GetDepth() - 1) / 2.0]
+                                )[2]
+                            )
+                            self.warning3d.emit()
                         z_align = sitk.TranslationTransform(3)
-                        z_align.SetOffset(
-                            [
-                                0,
-                                0,
-                                moving_image.GetOrigin()[2]
-                                - fixed_image.GetOrigin()[2],
-                            ]
-                        )
+                        z_align.SetOffset([0.0, 0.0, ztrans])
                         self.registration_results[i] = sitk.CompositeTransform(
                             [self.registration_results[i], z_align]
                         )
                         self.registration_results[i].FlattenTransform()
-                        # Use SimpleITK's epsilon to see if the 2D images are on
-                        # the same z plane.
-                        try:
-                            f = sitk.Image([1, 1, 1], sitk.sitkUInt8)
-                            f.SetOrigin([0, 0] + [fixed_image.GetOrigin()[2]])
-                            m = sitk.Image([1, 1, 1], sitk.sitkUInt8)
-                            m.SetOrigin([0, 0] + [moving_image.GetOrigin()[2]])
-                            f + m
-                        except Exception:
-                            self.warning2d.emit()
+
         # Use the stack trace as the error message to provide enough
         # detailes for debugging.
         except Exception:
