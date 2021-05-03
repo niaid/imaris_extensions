@@ -51,7 +51,7 @@ class TestIO:
             ),
             (
                 "image_2D_three_channels_one_resolution_four_timepoints.ims",
-                "d5c3cb2c39772fa00002a00a26e9a00e",
+                "59b218cd6134dc616e631a778bcc92ae",
             ),
             (
                 "image_3D_six_channels_four_resolutions_one_timepoint.ims",
@@ -303,19 +303,19 @@ class TestIO:
                     None,
                     (
                         "307a1361d5a7544078cd1ca365131ea9",
-                        "783b45321e1efa291fc726328d60db36",
+                        "0db4a6c2b43dd600e1ed3da9d1a5ea4d",
                     ),
                     (
                         "307a1361d5a7544078cd1ca365131ea9",
-                        "783b45321e1efa291fc726328d60db36",
+                        "0db4a6c2b43dd600e1ed3da9d1a5ea4d",
                     ),
                     (
                         "7b7b8ae148c50476b2fb624ad02040e1",
-                        "ee35a4c0160bd817e3c81d63d618abdd",
+                        "696ba910b4d6fd26ad2ba63468fe4f1b",
                     ),
                     (
                         "7b7b8ae148c50476b2fb624ad02040e1",
-                        "ee35a4c0160bd817e3c81d63d618abdd",
+                        "696ba910b4d6fd26ad2ba63468fe4f1b",
                     ),
                 ],
             ),
@@ -499,7 +499,7 @@ class TestIO:
                     None,
                     (
                         "76266ec9b4f72ef86d314455c079cd09",
-                        "3b5effec60d16fd16f10bb84861b4e69",
+                        "bc72611e8a40cabfcda0ed4750aca8e8",
                     ),
                 ],
             ),

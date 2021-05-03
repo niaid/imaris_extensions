@@ -265,12 +265,16 @@ def read_metadata(file_name):
                     .tobytes()
                     .decode("UTF-8")
                 )
+                if channel_information["name"] == "\x00":  # null byte
+                    channel_information["name"] = ""
                 channel_information["description"] = (
                     f[dataset_info_dirname][channel_str]
                     .attrs["Description"]
                     .tobytes()
                     .decode("UTF-8")
                 )
+                if channel_information["description"] == "\x00":  # null byte
+                    channel_information["description"] = ""
                 color_mode = (
                     f[dataset_info_dirname][channel_str]
                     .attrs["ColorMode"]
@@ -692,7 +696,11 @@ def channels_information_xmlstr2list(channels_information_xml_str):
     for i, channel_xml_info in enumerate(channels_xml_information):
         channel_info = {}
         channel_info["name"] = channel_xml_info.find("name").text
+        if channel_info["name"] is None:
+            channel_info["name"] = ""
         channel_info["description"] = channel_xml_info.find("description").text
+        if channel_info["description"] is None:
+            channel_info["description"] = ""
         if channel_xml_info.find("color") is not None:
             channel_info["color"] = [
                 float(c) / 255
@@ -801,39 +809,13 @@ def write(sitk_image, file_name):
     meta_data_dict = {}
     channels_information = []
     try:
-        channels_xml_information = list(
-            et.fromstring(sitk_image.GetMetaData(channels_metadata_key))
+        channels_information = channels_information_xmlstr2list(
+            sitk_image.GetMetaData(channels_metadata_key)
         )
-        if len(channels_xml_information) != number_of_channels:
+        if len(channels_information) != number_of_channels:
             raise ValueError(
                 f"Corrupt SimpleITK image, number of channels does not match meta data dictionary entry (key: {channels_metadata_key})"  # noqa: E501
             )
-        for i, channel_xml_info in enumerate(channels_xml_information):
-            channel_info = {}
-            channel_info["name"] = channel_xml_info.find("name").text
-            channel_info["description"] = channel_xml_info.find("description").text
-            if channel_xml_info.find("color") is not None:
-                channel_info["color"] = [
-                    float(c) / 255
-                    for c in channel_xml_info.find("color")
-                    .text.replace(",", " ")
-                    .split()
-                ]
-            elif channel_xml_info.find("color_table") is not None:
-                channel_info["color_table"] = [
-                    float(c) / 255
-                    for c in channel_xml_info.find("color_table")
-                    .text.replace(",", " ")
-                    .split()
-                ]
-            channel_info["range"] = [
-                float(c)
-                for c in channel_xml_info.find("range").text.replace(",", " ").split()
-            ]
-            if channel_xml_info.find("gamma"):  # Gamma is optional
-                channel_info["gamma"] = float(channel_xml_info.find("gamma").text)
-            channel_info["alpha"] = float(channel_xml_info.find("alpha").text)
-            channels_information.append((i, channel_info))
     except RuntimeError:  # channels information is missing, we'll create it
         default_colors = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
         for i in range(number_of_channels):
