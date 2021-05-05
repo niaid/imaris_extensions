@@ -431,20 +431,54 @@ def write_channels_metadata(meta_data_dict, file_name, access_mode="a"):
             elif "color_table" in channel_information:
                 if prev_color_mode == "BaseColor":
                     del f[dataset_info_dirname][channel_str].attrs["Color"]
-                # Imaris 9.5.1 supports the actual color table to be either in the attributes
-                # or as a dataset. For some reason when setting it as a dataset Imaris
-                # does not read it correctly, so we set it as an attribute.
-                f[dataset_info_dirname][channel_str].attrs[
-                    "ColorTable"
-                ] = np.frombuffer(
-                    (
-                        " ".join(
-                            [f"{v:.3f}" for v in channel_information["color_table"]]
-                        )
-                        + " "
-                    ).encode("UTF-8"),
-                    dtype="S1",
-                )
+                # Imaris expects the color table infromation to be either in an attribute
+                # or in a dataset.
+                # For some reason, I can't get h5py to write the dataset in the format expected by Imaris.
+                # String, Fixed length=1, padding=H5T_STR_NULLTERM, cset = H5T_CSET_ASCII
+                # The padding is always H5T_STR_NULLPAD.
+                # Tried a workaround similar to that described on SO, creating a custom type but that didn't work:
+                # https://stackoverflow.com/questions/38267076/how-to-write-a-dataset-of-null-terminated-fixed-length-strings-with-h5py
+                # tid = h5py.h5t.C_S1.copy()
+                # tid.set_strpad(h5py.h5t.STR_NULLTERM)
+                # H5T_C_S1_1 = h5py.Datatype(tid)
+                #
+                # The current "solution" is to write the color table information as an
+                # attribute and if that fails write as dataset so the information isn't lost.
+                # If the color table is large (>64K bytes) then writting
+                # to attribute will fail as it is larger than the HDF5 limit. We then save it as
+                # dataset even if imaris will cannot read it. We can export the file settings which will
+                # export the color table as a text file. We can then import the color table back directly
+                # from imaris and save the file.
+                # Possibly revisit, allowing for larger attributes via dense attribute storage:
+                # https://github.com/h5py/h5py/issues/1778
+                try:
+                    f[dataset_info_dirname][channel_str].attrs[
+                        "ColorTable"
+                    ] = np.frombuffer(
+                        (
+                            " ".join(
+                                [f"{v:.3f}" for v in channel_information["color_table"]]
+                            )
+                            + " "
+                        ).encode("UTF-8"),
+                        dtype="S1",
+                    )
+                except RuntimeError:
+                    f[dataset_info_dirname][channel_str].create_dataset(
+                        "ColorTable",
+                        data=np.frombuffer(
+                            (
+                                " ".join(
+                                    [
+                                        f"{v:.3f}"
+                                        for v in channel_information["color_table"]
+                                    ]
+                                )
+                                + " "
+                            ).encode("UTF-8"),
+                            dtype="S1",
+                        ),
+                    )
                 f[dataset_info_dirname][channel_str].attrs[
                     "ColorTableLength"
                 ] = np.frombuffer(
