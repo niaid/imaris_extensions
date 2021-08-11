@@ -155,6 +155,14 @@ class ExportChannelSettingsDialog(ieb.ImarisExtensionBase):
         button.clicked.connect(self.__export_channel_settings)
         layout.addWidget(button)
 
+    def closeEvent(self, event):
+        """
+        Override the closeEvent method so that clicking the 'x' button also
+        closes all of the dialogs.
+        """
+        self.help_dialog.close()
+        event.accept()
+
     def __browse_callback(self):
         file_name, _ = QFileDialog.getOpenFileName(
             self, "QFileDialog.getOpenFileName()", "", "Imaris (*.ims);;All Files (*)"
