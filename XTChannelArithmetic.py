@@ -251,6 +251,14 @@ class ChannelArithmeticDialog(ieb.ImarisExtensionBase):
 
         self.status_bar = self.statusBar()
 
+    def closeEvent(self, event):
+        """
+        Override the closeEvent method so that clicking the 'x' button also
+        closes all of the dialogs.
+        """
+        self.help_dialog.close()
+        event.accept()
+
     def __create_arithmetic_widget(self):
         wid = QWidget(self)
         arithmetic_layout = QVBoxLayout()
