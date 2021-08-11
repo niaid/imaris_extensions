@@ -172,6 +172,14 @@ class ConfigureChannelSettingsDialog(ieb.ImarisExtensionBase):
         self.stack.addWidget(apply_widget)
         layout.addWidget(self.stack)
 
+    def closeEvent(self, event):
+        """
+        Override the closeEvent method so that clicking the 'x' button also
+        closes all of the dialogs.
+        """
+        self.help_dialog.close()
+        event.accept()
+
     def __show_stacked_widget(self, i):
         self.stack.setCurrentIndex(i)
 
