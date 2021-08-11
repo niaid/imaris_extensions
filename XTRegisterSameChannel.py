@@ -276,6 +276,15 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
 
         self.status_bar = self.statusBar()
 
+    def closeEvent(self, event):
+        """
+        Override the closeEvent method so that clicking the 'x' button also
+        closes all of the dialogs.
+        """
+        self.help_dialog.close()
+        self.advanced_settings_widget.close()
+        event.accept()
+
     def __create_advanced_settings_widget(self):
         wid = QWidget()
         wid.setWindowTitle("Advanced Settings")
