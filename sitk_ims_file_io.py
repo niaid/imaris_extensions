@@ -323,6 +323,46 @@ def read_metadata(file_name):
     return meta_data_dict
 
 
+def _ims_set_nullterm_str_attribute(hdf_object, attribute_name, attribute_value):
+    """
+    Set the value of an attribute attached to the given object. If the attribute
+    does not exist it is created. Attribute is encoded as
+    an array of fixed length (length of 1) null terminated strings. This encoding
+    is specific to imaris and is problematic. The individual string length should
+    be two, 'a\x00', but this is not how imaris encodes it.
+
+    This function uses the low level h5py API because the high level API will
+    always write the fixed length strings as H5T_STR_NULLPAD and not H5T_STR_NULLTERM
+    which is what Imaris is expecting.
+
+    For additional details see the HDF discourse:
+        https://forum.hdfgroup.org/t/nullpad-nullterm-strings/9107
+
+    Parameters
+    ----------
+    hdf_object (File/Group/Dataset): Attribute will be attached to this object.
+    attribute_name (str): Attribute name.
+    attribute_value (str): Byte string representation of the attribute value (i.e.
+                           b'255' or b'255.000').
+    """
+    # Because we are dealing with fixed length strings we delete the attribute
+    # and create it again with the current size. If the attribute doesn't exist
+    # we just catch the exception and ignore.
+    try:
+        del hdf_object.attrs[attribute_name]
+    except KeyError:
+        pass
+    type_id = h5py.h5t.TypeID.copy(h5py.h5t.C_S1)
+    type_id.set_size(1)
+    type_id.set_strpad(h5py.h5t.STR_NULLTERM)
+    attribute_arr = np.frombuffer(attribute_value, dtype="|S1")
+    space = h5py.h5s.create_simple((len(attribute_arr),))
+    attribute_id = h5py.h5a.create(
+        hdf_object.id, attribute_name.encode("UTF-8"), type_id, space
+    )
+    attribute_id.write(attribute_arr, mtype=attribute_id.get_type())
+
+
 def write_channels_metadata(meta_data_dict, file_name, access_mode="a"):
     """
     Write the channel metadata into the given file. If file doesn't exist create it.
@@ -352,35 +392,38 @@ def write_channels_metadata(meta_data_dict, file_name, access_mode="a"):
             num_channels = len(meta_data_dict["channels_information"])
             dataset_info_dirname = default_dataset_info_dirname
             dataset_dirname = default_dataset_dirname
-            f.attrs["ImarisDataSet"] = np.frombuffer(b"ImarisDataSet", dtype="S1")
-            f.attrs["ImarisVersion"] = np.frombuffer(b"5.5.0", dtype="S1")
-            f.attrs["DataSetInfoDirectoryName"] = np.frombuffer(
-                dataset_info_dirname.encode("UTF-8"), dtype="S1"
+            _ims_set_nullterm_str_attribute(f, "ImarisDataSet", b"ImarisDataSet")
+            _ims_set_nullterm_str_attribute(f, "ImarisVersion", b"5.5.0")
+            _ims_set_nullterm_str_attribute(
+                f, "DataSetInfoDirectoryName", dataset_info_dirname.encode("UTF-8")
             )
-            f.attrs["DataSetDirectoryName"] = np.frombuffer(
-                dataset_dirname.encode("UTF-8"), dtype="S1"
+            _ims_set_nullterm_str_attribute(
+                f, "DataSetDirectoryName", dataset_dirname.encode("UTF-8")
             )
             f.attrs["NumberOfDataSets"] = np.array([1], dtype=np.uint32)
 
             f.create_group(dataset_info_dirname + "/ImarisDataSet")
-            f[dataset_info_dirname]["ImarisDataSet"].attrs["Creator"] = np.frombuffer(
-                b"SimpleITK", dtype="S1"
+            _ims_set_nullterm_str_attribute(
+                f[dataset_info_dirname]["ImarisDataSet"], "Creator", b"SimpleITK"
             )
-            f[dataset_info_dirname]["ImarisDataSet"].attrs[
-                "NumberOfImages"
-            ] = np.frombuffer(b"1", dtype="S1")
-            f[dataset_info_dirname]["ImarisDataSet"].attrs["Version"] = np.frombuffer(
-                str(sitk.Version()).encode("UTF-8"), dtype="S1"
+            _ims_set_nullterm_str_attribute(
+                f[dataset_info_dirname]["ImarisDataSet"], "NumberOfImages", b"1"
+            )
+            _ims_set_nullterm_str_attribute(
+                f[dataset_info_dirname]["ImarisDataSet"],
+                "Version",
+                str(sitk.Version()).encode("UTF-8"),
             )
 
             f.create_group(dataset_info_dirname + "/Imaris")
-            f[dataset_info_dirname]["Imaris"].attrs["ThumbnailMode"] = np.frombuffer(
-                b"thumbnailNone", dtype="S1"
+            _ims_set_nullterm_str_attribute(
+                f[dataset_info_dirname]["Imaris"], "ThumbnailMode", b"thumbnailNone"
             )
-            f[dataset_info_dirname]["Imaris"].attrs["Version"] = np.frombuffer(
-                str(sitk.Version()).encode("UTF-8"), dtype="S1"
+            _ims_set_nullterm_str_attribute(
+                f[dataset_info_dirname]["Imaris"],
+                "Version",
+                str(sitk.Version()).encode("UTF-8"),
             )
-
             for i in range(num_channels):
                 f.create_group(dataset_info_dirname + f"/Channel {i}")
         indexes, _ = zip(*meta_data_dict["channels_information"])
@@ -395,14 +438,16 @@ def write_channels_metadata(meta_data_dict, file_name, access_mode="a"):
         for i, channel_information in meta_data_dict["channels_information"]:
             channel_str = f"Channel {i}"
             if "name" in channel_information:
-                f[dataset_info_dirname][channel_str].attrs["Name"] = np.frombuffer(
-                    channel_information["name"].encode("UTF-8"), dtype="S1"
+                _ims_set_nullterm_str_attribute(
+                    f[dataset_info_dirname][channel_str],
+                    "Name",
+                    channel_information["name"].encode("UTF-8"),
                 )
             if "description" in channel_information:
-                f[dataset_info_dirname][channel_str].attrs[
-                    "Description"
-                ] = np.frombuffer(
-                    channel_information["description"].encode("UTF-8"), dtype="S1"
+                _ims_set_nullterm_str_attribute(
+                    f[dataset_info_dirname][channel_str],
+                    "Description",
+                    channel_information["description"].encode("UTF-8"),
                 )
             prev_color_mode = (
                 f[dataset_info_dirname][channel_str]
@@ -419,14 +464,15 @@ def write_channels_metadata(meta_data_dict, file_name, access_mode="a"):
                 if "ColorTable" not in f[dataset_info_dirname][channel_str].attrs:
                     del f[dataset_info_dirname][channel_str]["ColorTable"]
             if "color" in channel_information:
-                f[dataset_info_dirname][channel_str].attrs["ColorMode"] = np.frombuffer(
-                    b"BaseColor", dtype="S1"
+                _ims_set_nullterm_str_attribute(
+                    f[dataset_info_dirname][channel_str], "ColorMode", b"BaseColor"
                 )
-                f[dataset_info_dirname][channel_str].attrs["Color"] = np.frombuffer(
-                    (
-                        " ".join([f"{v:.3f}" for v in channel_information["color"]])
-                    ).encode("UTF-8"),
-                    dtype="S1",
+                _ims_set_nullterm_str_attribute(
+                    f[dataset_info_dirname][channel_str],
+                    "Color",
+                    " ".join([f"{v:.3f}" for v in channel_information["color"]]).encode(
+                        "UTF-8"
+                    ),
                 )
             elif "color_table" in channel_information:
                 if prev_color_mode == "BaseColor":
@@ -446,11 +492,11 @@ def write_channels_metadata(meta_data_dict, file_name, access_mode="a"):
                 # attribute and if that fails write as dataset so the information isn't lost.
                 # If the color table is large (>64K bytes) then writting
                 # to attribute will fail as it is larger than the HDF5 limit. We then save it as
-                # dataset even if imaris will cannot read it. We can export the file settings which will
+                # dataset even if imaris will not read it. We can export the file settings which will
                 # export the color table as a text file. We can then import the color table back directly
                 # from imaris and save the file.
-                # Possibly revisit, allowing for larger attributes via dense attribute storage:
-                # https://github.com/h5py/h5py/issues/1778
+                # Possibly revisit, using low level h5py API as done for the
+                # attribute writing.
                 try:
                     f[dataset_info_dirname][channel_str].attrs[
                         "ColorTable"
@@ -479,37 +525,35 @@ def write_channels_metadata(meta_data_dict, file_name, access_mode="a"):
                             dtype="S1",
                         ),
                     )
-                f[dataset_info_dirname][channel_str].attrs[
-                    "ColorTableLength"
-                ] = np.frombuffer(
+                _ims_set_nullterm_str_attribute(
+                    f[dataset_info_dirname][channel_str],
+                    "ColorTableLength",
                     str(int(len(channel_information["color_table"]) / 3)).encode(
                         "UTF-8"
                     ),
-                    dtype="S1",
                 )
-                f[dataset_info_dirname][channel_str].attrs["ColorMode"] = np.frombuffer(
-                    b"TableColor", dtype="S1"
+                _ims_set_nullterm_str_attribute(
+                    f[dataset_info_dirname][channel_str], "ColorMode", b"TableColor"
                 )
             if "range" in channel_information:
-                f[dataset_info_dirname][channel_str].attrs[
-                    "ColorRange"
-                ] = np.frombuffer(
+                _ims_set_nullterm_str_attribute(
+                    f[dataset_info_dirname][channel_str],
+                    "ColorRange",
                     " ".join([f"{v:.3f}" for v in channel_information["range"]]).encode(
                         "UTF-8"
                     ),
-                    dtype="S1",
                 )
             if "gamma" in channel_information:
-                f[dataset_info_dirname][channel_str].attrs[
-                    "GammaCorrection"
-                ] = np.frombuffer(
-                    f'{channel_information["gamma"]:.3f}'.encode("UTF-8"), dtype="S1"
+                _ims_set_nullterm_str_attribute(
+                    f[dataset_info_dirname][channel_str],
+                    "GammaCorrection",
+                    f'{channel_information["gamma"]:.3f}'.encode("UTF-8"),
                 )
             if "alpha" in channel_information:
-                f[dataset_info_dirname][channel_str].attrs[
-                    "ColorOpacity"
-                ] = np.frombuffer(
-                    f'{channel_information["alpha"]:.3f}'.encode("UTF-8"), dtype="S1"
+                _ims_set_nullterm_str_attribute(
+                    f[dataset_info_dirname][channel_str],
+                    "ColorOpacity",
+                    f'{channel_information["alpha"]:.3f}'.encode("UTF-8"),
                 )
 
 
@@ -872,39 +916,40 @@ def write(sitk_image, file_name):
         dataset_dirname = default_dataset_dirname
 
         f.create_group(dataset_info_dirname + "/TimeInfo")
-        f[dataset_info_dirname]["TimeInfo"].attrs["DatasetTimePoints"] = np.array(
-            [1], dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["TimeInfo"], "DatasetTimePoints", b"1"
         )
-        f[dataset_info_dirname]["TimeInfo"].attrs["FileTimePoints"] = np.array(
-            [1], dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["TimeInfo"], "FileTimePoints", b"1"
         )
         # For some reason the TimePoint attributes start with 1 and not 0.
-        f[dataset_info_dirname]["TimeInfo"].attrs["TimePoint1"] = np.frombuffer(
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["TimeInfo"],
+            "TimePoint1",
             sitk_image.GetMetaData(time_metadata_key).encode("UTF-8")
             if sitk_image.HasMetaDataKey(time_metadata_key)
             else str(datetime.datetime.now()).encode("UTF-8"),
-            dtype="S1",
         )
         f.create_group(dataset_info_dirname + "/Image")
         unit_str = (
-            sitk_image.GetMetaData(unit_metadata_key).encode("UTF-8")
+            sitk_image.GetMetaData(unit_metadata_key)
             if sitk_image.HasMetaDataKey(unit_metadata_key)
-            else b"mm"
+            else "mm"
         )
-        f[dataset_info_dirname]["Image"].attrs["Unit"] = np.frombuffer(
-            unit_str, dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["Image"], "Unit", unit_str.encode("UTF-8")
         )
         image_size = sitk_image.GetSize()[
             0:3
         ]  # Get the size for vector or scalar pixel types
-        f[dataset_info_dirname]["Image"].attrs["X"] = np.frombuffer(
-            str(image_size[0]).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["Image"], "X", str(image_size[0]).encode("UTF-8")
         )
-        f[dataset_info_dirname]["Image"].attrs["Y"] = np.frombuffer(
-            str(image_size[1]).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["Image"], "Y", str(image_size[1]).encode("UTF-8")
         )
-        f[dataset_info_dirname]["Image"].attrs["Z"] = np.frombuffer(
-            str(image_size[2]).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["Image"], "Z", str(image_size[2]).encode("UTF-8")
         )
         image_origin = sitk_image.GetOrigin()[0:3]
         image_spacing = sitk_image.GetSpacing()[0:3]
@@ -915,37 +960,49 @@ def write(sitk_image, file_name):
             else sitk_image.TransformIndexToPhysicalPoint(image_size + (0,))[0:3]
         )
         max_ext = [edg - 0.5 * spc for edg, spc in zip(image_edge, image_spacing)]
-        f[dataset_info_dirname]["Image"].attrs["ExtMin0"] = np.frombuffer(
-            str(min_ext[0]).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["Image"],
+            "ExtMin0",
+            f"{min_ext[0]:.3f}".encode("UTF-8"),
         )
-        f[dataset_info_dirname]["Image"].attrs["ExtMin1"] = np.frombuffer(
-            str(min_ext[1]).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["Image"],
+            "ExtMin1",
+            f"{min_ext[1]:.3f}".encode("UTF-8"),
         )
-        f[dataset_info_dirname]["Image"].attrs["ExtMin2"] = np.frombuffer(
-            str(min_ext[2]).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["Image"],
+            "ExtMin2",
+            f"{min_ext[2]:.3f}".encode("UTF-8"),
         )
-        f[dataset_info_dirname]["Image"].attrs["ExtMax0"] = np.frombuffer(
-            str(max_ext[0]).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["Image"],
+            "ExtMax0",
+            f"{max_ext[0]:.3f}".encode("UTF-8"),
         )
-        f[dataset_info_dirname]["Image"].attrs["ExtMax1"] = np.frombuffer(
-            str(max_ext[1]).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["Image"],
+            "ExtMax1",
+            f"{max_ext[1]:.3f}".encode("UTF-8"),
         )
-        f[dataset_info_dirname]["Image"].attrs["ExtMax2"] = np.frombuffer(
-            str(max_ext[2]).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["Image"],
+            "ExtMax2",
+            f"{max_ext[2]:.3f}".encode("UTF-8"),
         )
 
         for i in range(number_of_channels):
             grp = f.create_group(
                 dataset_dirname + f"/ResolutionLevel 0/TimePoint 0/Channel {i}"
             )
-            grp.attrs["ImageSizeX"] = np.frombuffer(
-                str(image_size[0]).encode("UTF-8"), dtype="S1"
+            _ims_set_nullterm_str_attribute(
+                grp, "ImageSizeX", str(image_size[0]).encode("UTF-8")
             )
-            grp.attrs["ImageSizeY"] = np.frombuffer(
-                str(image_size[1]).encode("UTF-8"), dtype="S1"
+            _ims_set_nullterm_str_attribute(
+                grp, "ImageSizeY", str(image_size[1]).encode("UTF-8")
             )
-            grp.attrs["ImageSizeZ"] = np.frombuffer(
-                str(image_size[2]).encode("UTF-8"), dtype="S1"
+            _ims_set_nullterm_str_attribute(
+                grp, "ImageSizeZ", str(image_size[2]).encode("UTF-8")
             )
             if vector_pixels:
                 channel = sitk.VectorIndexSelectionCast(sitk_image, i)
@@ -958,13 +1015,51 @@ def write(sitk_image, file_name):
             # complicated so we let the hdf5 automatically guess a good chunk size by setting
             # chunks=True.
             # Imaris only supports gzip and example files have compression level 2 (options are in [0,9]).
+            channel_arr_view = sitk.GetArrayViewFromImage(channel)
             grp.create_dataset(
                 "Data",
-                data=sitk.GetArrayViewFromImage(channel),
+                data=channel_arr_view,
                 chunks=True,
                 compression="gzip",
                 compression_opts=2,
             )
+            _write_channel_histogram(grp, channel_arr_view, channel.GetPixelID())
+
+
+def _write_channel_histogram(grp, channel_arr_view, pixel_id):
+    min_pixel_value = channel_arr_view.min()
+    max_pixel_value = channel_arr_view.max()
+    _ims_set_nullterm_str_attribute(
+        grp, "HistogramMin", f"{min_pixel_value:.3f}".encode("UTF-8")
+    )
+    _ims_set_nullterm_str_attribute(
+        grp, "HistogramMax", f"{max_pixel_value:.3f}".encode("UTF-8")
+    )
+    channel_histogram, _ = np.histogram(channel_arr_view, bins=256)
+    grp.create_dataset(
+        "Histogram",
+        data=channel_histogram,
+        chunks=True,
+        compression="gzip",
+        compression_opts=2,
+    )
+    # A pixel type which has a range larger than [0,255], file also has a
+    # histogram of 1024 bins for these types
+    if pixel_id in [sitk.sitkFloat32, sitk.sitkUInt16, sitk.sitkUInt32]:
+        _ims_set_nullterm_str_attribute(
+            grp, "HistogramMin1024", f"{min_pixel_value:.3f}".encode("UTF-8")
+        )
+        _ims_set_nullterm_str_attribute(
+            grp, "HistogramMax1024", f"{max_pixel_value:.3f}".encode("UTF-8")
+        )
+        channel_histogram, _ = np.histogram(channel_arr_view, bins=1024)
+        grp.create_dataset(
+            "Histogram",
+            data=channel_histogram,
+            chunks=True,
+            compression="gzip",
+            compression_opts=2,
+        )
 
 
 def _get_chunk_size(image_size, sitk_pixel_type):
@@ -1137,15 +1232,27 @@ def append_channels(sitk_image, file_name, time_index=0):
                     + resolution_name
                     + f"/TimePoint {time_index}/Channel {i}"
                 )
-                grp.attrs["ImageSizeX"] = f[dataset_dirname][resolution_name][
-                    "TimePoint 0"
-                ]["Channel 0"].attrs["ImageSizeX"]
-                grp.attrs["ImageSizeY"] = f[dataset_dirname][resolution_name][
-                    "TimePoint 0"
-                ]["Channel 0"].attrs["ImageSizeY"]
-                grp.attrs["ImageSizeZ"] = f[dataset_dirname][resolution_name][
-                    "TimePoint 0"
-                ]["Channel 0"].attrs["ImageSizeZ"]
+                _ims_set_nullterm_str_attribute(
+                    grp,
+                    "ImageSizeX",
+                    f[dataset_dirname][resolution_name]["TimePoint 0"]["Channel 0"]
+                    .attrs["ImageSizeX"]
+                    .tobytes(),
+                )
+                _ims_set_nullterm_str_attribute(
+                    grp,
+                    "ImageSizeY",
+                    f[dataset_dirname][resolution_name]["TimePoint 0"]["Channel 0"]
+                    .attrs["ImageSizeY"]
+                    .tobytes(),
+                )
+                _ims_set_nullterm_str_attribute(
+                    grp,
+                    "ImageSizeZ",
+                    f[dataset_dirname][resolution_name]["TimePoint 0"]["Channel 0"]
+                    .attrs["ImageSizeZ"]
+                    .tobytes(),
+                )
                 if number_of_channels > 1:
                     channel = sitk.VectorIndexSelectionCast(
                         current_sitk_image, i - time_index_existing_number_of_channels
@@ -1154,13 +1261,16 @@ def append_channels(sitk_image, file_name, time_index=0):
                     channel = current_sitk_image
                 # Save the channel information using the hdf5 chunking mechanism and compress.
                 # Use the settings from an exsiting channel.
+                channel_arr_view = sitk.GetArrayViewFromImage(channel)
                 grp.create_dataset(
                     "Data",
-                    data=np.pad(sitk.GetArrayViewFromImage(channel), padding),
+                    data=np.pad(channel_arr_view, padding),
                     chunks=existing_chunk_size,
                     compression=existing_compression,
                     compression_opts=existing_compression_opts,
                 )
+                _write_channel_histogram(grp, channel_arr_view, channel.GetPixelID())
+
         # Create the additional channels metadata groups that are expected to
         # exist by the write_channels_metadata method.
         # We also accomodate for inconsistant imaris behavior where a channel
@@ -1295,15 +1405,21 @@ def append_timepoint(sitk_image, image_time, file_name):
         )
 
         new_time_point_num = len(existing_image_metadata["times"]) + 1
-        f[dataset_info_dirname]["TimeInfo"].attrs["DatasetTimePoints"] = np.frombuffer(
-            str(new_time_point_num).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["TimeInfo"],
+            "DatasetTimePoints",
+            str(new_time_point_num).encode("UTF-8"),
         )
-        f[dataset_info_dirname]["TimeInfo"].attrs["FileTimePoints"] = np.frombuffer(
-            str(new_time_point_num).encode("UTF-8"), dtype="S1"
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["TimeInfo"],
+            "FileTimePoints",
+            str(new_time_point_num).encode("UTF-8"),
         )
-        f[dataset_info_dirname]["TimeInfo"].attrs[
-            f"TimePoint{new_time_point_num}"
-        ] = np.frombuffer(str(image_time).encode("UTF-8"), dtype="S1")
+        _ims_set_nullterm_str_attribute(
+            f[dataset_info_dirname]["TimeInfo"],
+            f"TimePoint{new_time_point_num}",
+            str(image_time).encode("UTF-8"),
+        )
 
         for res_index in range(len(f[dataset_dirname])):
             resolution_name = f"ResolutionLevel {res_index}"
@@ -1370,14 +1486,14 @@ def append_timepoint(sitk_image, image_time, file_name):
                     dataset_dirname
                     + f"/{resolution_name}/TimePoint {new_time_point_num-1}/Channel {i}"
                 )
-                grp.attrs["ImageSizeX"] = np.frombuffer(
-                    str(new_image_size[0]).encode("UTF-8"), dtype="S1"
+                _ims_set_nullterm_str_attribute(
+                    grp, "ImageSizeX", str(new_image_size[0]).encode("UTF-8")
                 )
-                grp.attrs["ImageSizeY"] = np.frombuffer(
-                    str(new_image_size[1]).encode("UTF-8"), dtype="S1"
+                _ims_set_nullterm_str_attribute(
+                    grp, "ImageSizeY", str(new_image_size[1]).encode("UTF-8")
                 )
-                grp.attrs["ImageSizeZ"] = np.frombuffer(
-                    str(new_image_size[2]).encode("UTF-8"), dtype="S1"
+                _ims_set_nullterm_str_attribute(
+                    grp, "ImageSizeZ", str(new_image_size[2]).encode("UTF-8")
                 )
                 if vector_pixels:
                     channel = sitk.VectorIndexSelectionCast(current_sitk_image, i)
@@ -1387,10 +1503,12 @@ def append_timepoint(sitk_image, image_time, file_name):
                     channel = current_sitk_image
                 # Save the channel information using the hdf5 chunking mechanism and compress.
                 # Use the settings from an existing channel.
+                channel_arr_view = sitk.GetArrayViewFromImage(channel)
                 grp.create_dataset(
                     "Data",
-                    data=np.pad(sitk.GetArrayViewFromImage(channel), padding),
+                    data=np.pad(channel_arr_view, padding),
                     chunks=existing_chunk_size,
                     compression=existing_compression,
                     compression_opts=existing_compression_opts,
                 )
+                _write_channel_histogram(grp, channel_arr_view, channel.GetPixelID())
