@@ -2,6 +2,7 @@
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) &nbsp;&nbsp;
 ![ubuntu / macos / windows (Python 3.7, 3.8)](https://github.com/niaid/imaris_extensions/actions/workflows/main.yml/badge.svg)
+&nbsp;&nbsp;[![https://niaid.github.io/imaris_extensions/](https://img.shields.io/website-up-down-brightgreen-red/http/shields.io.svg)](https://niaid.github.io/imaris_extensions/)
 
 This repository contains extensions, plugins, for the [Imaris](https://imaris.oxinst.com/) (Oxford Instruments) microscopy image analysis program. They either provide additional image analysis capabilities via the open source [SimpleITK](https://simpleitk.org) image analysis library, or are utilities that allow the user to easily modify meta-data associated with images stored in the Imaris file format (e.g. channel names, colors).
 
