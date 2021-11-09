@@ -61,6 +61,10 @@ class TestIO:
                 "image_3D_three_channels_two_resolutions_four_timepoints.ims",
                 "4a12e67f0e26223400147ec1f05712b7",
             ),
+            (
+                "image_3D_four_channels_two_resolutions_one_timepoint_uint16.ims",
+                "78e2ae8346cb550e9826608ec6d9a211",
+            ),
         ],
     )
     def test_metadata_read(self, file_name, metadata_md5_hash):
@@ -103,6 +107,10 @@ class TestIO:
             (
                 "image_3D_three_channels_two_resolutions_four_timepoints.ims",
                 "4465fb02fc832921cea3cba5447ce258",
+            ),
+            (
+                "image_3D_four_channels_two_resolutions_one_timepoint_uint16.ims",
+                "c7d1f0ef266407cbb8a9031bfc7170a5",
             ),
         ],
     )
@@ -168,6 +176,11 @@ class TestIO:
                 [range(0, 1), range(0, 1), range(0, 1)],
                 "fbc5a342329f102a7988b14ddf5cb9e9",
             ),
+            (
+                "image_3D_four_channels_two_resolutions_one_timepoint_uint16.ims",
+                [range(0, 1), range(0, 1), range(0, 1)],
+                "f833a3ab37fd666a08b597d248f0961e",
+            ),
         ],
     )
     def test_subregion_read(self, file_name, sub_ranges, subregion_md5_hash):
@@ -192,6 +205,7 @@ class TestIO:
             vector_pixels=True,
             convert_to_mm=False,
         )
+        print(self.image_md5(sitk_image))
         hash_matches = self.image_md5(sitk_image) == subregion_md5_hash
         images_equal = all(
             [
@@ -215,6 +229,11 @@ class TestIO:
                 "image_3D_six_channels_four_resolutions_one_timepoint.ims",
                 2,
                 "27e5f552fdf84ce7b8035da83d774b11",
+            ),
+            (
+                "image_3D_four_channels_two_resolutions_one_timepoint_uint16.ims",
+                1,
+                "d2d0cf6ca77796820134eed7d7f991f3",
             ),
         ],
     )
@@ -385,6 +404,28 @@ class TestIO:
                     ),
                 ],
             ),
+            (
+                "image_3D_four_channels_two_resolutions_one_timepoint_uint16.ims",
+                [
+                    None,
+                    (
+                        "5bec5defeda0d3f0c34a716c20cfb66e",
+                        "18a4d47d7a82b515f33ac3f8e802db17",
+                    ),
+                    (
+                        "5bec5defeda0d3f0c34a716c20cfb66e",
+                        "18a4d47d7a82b515f33ac3f8e802db17",
+                    ),
+                    (
+                        "e8ecca2783e5946b7785c240efb45347",
+                        "3be999965c6fabf943a0ae5d00814884",
+                    ),
+                    (
+                        "e8ecca2783e5946b7785c240efb45347",
+                        "3be999965c6fabf943a0ae5d00814884",
+                    ),
+                ],
+            ),
         ],
     )
     def test_append_channels(self, file_name, results_md5, tmp_path):
@@ -523,6 +564,16 @@ class TestIO:
                     ),
                 ],
             ),
+            (
+                "image_3D_four_channels_two_resolutions_one_timepoint_uint16.ims",
+                [
+                    None,
+                    (
+                        "c7d1f0ef266407cbb8a9031bfc7170a5",
+                        "f3bee6c13f685fa0a4f55444bfad15da",
+                    ),
+                ],
+            ),
         ],
     )
     def test_append_timepoint(self, file_name, results_md5, tmp_path):
@@ -621,6 +672,7 @@ class TestIO:
             "image_2D_three_channels_one_resolution_four_timepoints.ims",
             "image_3D_six_channels_four_resolutions_one_timepoint.ims",
             "image_3D_three_channels_two_resolutions_four_timepoints.ims",
+            "image_3D_four_channels_two_resolutions_one_timepoint_uint16.ims",
         ],
     )
     def test_write(self, file_name, tmp_path):

@@ -1,4 +1,0 @@
-image_2D_six_channels_one_resolution_one_timepoint.ims filter=lfs diff=lfs merge=lfs -text
-image_2D_three_channels_one_resolution_four_timepoints.ims filter=lfs diff=lfs merge=lfs -text
-image_3D_six_channels_four_resolutions_one_timepoint.ims filter=lfs diff=lfs merge=lfs -text
-image_3D_three_channels_two_resolutions_four_timepoints.ims filter=lfs diff=lfs merge=lfs -text

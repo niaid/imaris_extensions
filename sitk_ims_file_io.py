@@ -963,32 +963,32 @@ def write(sitk_image, file_name):
         _ims_set_nullterm_str_attribute(
             f[dataset_info_dirname]["Image"],
             "ExtMin0",
-            f"{min_ext[0]:.3f}".encode("UTF-8"),
+            str(min_ext[0]).encode("UTF-8"),
         )
         _ims_set_nullterm_str_attribute(
             f[dataset_info_dirname]["Image"],
             "ExtMin1",
-            f"{min_ext[1]:.3f}".encode("UTF-8"),
+            str(min_ext[1]).encode("UTF-8"),
         )
         _ims_set_nullterm_str_attribute(
             f[dataset_info_dirname]["Image"],
             "ExtMin2",
-            f"{min_ext[2]:.3f}".encode("UTF-8"),
+            str(min_ext[2]).encode("UTF-8"),
         )
         _ims_set_nullterm_str_attribute(
             f[dataset_info_dirname]["Image"],
             "ExtMax0",
-            f"{max_ext[0]:.3f}".encode("UTF-8"),
+            str(max_ext[0]).encode("UTF-8"),
         )
         _ims_set_nullterm_str_attribute(
             f[dataset_info_dirname]["Image"],
             "ExtMax1",
-            f"{max_ext[1]:.3f}".encode("UTF-8"),
+            str(max_ext[1]).encode("UTF-8"),
         )
         _ims_set_nullterm_str_attribute(
             f[dataset_info_dirname]["Image"],
             "ExtMax2",
-            f"{max_ext[2]:.3f}".encode("UTF-8"),
+            str(max_ext[2]).encode("UTF-8"),
         )
 
         for i in range(number_of_channels):
@@ -1054,7 +1054,7 @@ def _write_channel_histogram(grp, channel_arr_view, pixel_id):
         )
         channel_histogram, _ = np.histogram(channel_arr_view, bins=1024)
         grp.create_dataset(
-            "Histogram",
+            "Histogram1024",
             data=channel_histogram,
             chunks=True,
             compression="gzip",
