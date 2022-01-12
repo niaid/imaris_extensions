@@ -19,7 +19,7 @@ git clone git@github.com:your_github_username/imaris_extensions.git
 git remote add upstream git@github.com:niaid/imaris_extensions.git
 ```
 3. Set up the development environment using the
-[environment_dev.yml](environment_dev.yml) or [requirements_dev.yml](requirements_dev.yml) files. This will install all dependencies including those only used during
+[environment_dev.yml](environment_dev.yml) or [requirements_dev.txt](requirements_dev.txt) files. This will install all dependencies including those only used during
 development (e.g. [pytest](https://docs.pytest.org), [black](https://black.readthedocs.io/en/stable/) etc.):
 ```
 #setup a virtual environment named imaris_dev using your favorite tool (venv, virtualenv etc.)
