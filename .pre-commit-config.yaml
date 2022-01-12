@@ -1,0 +1,27 @@
+# .pre-commit-config.yaml
+# for details see https://pre-commit.com
+# for list of available hooks see https://pre-commit.com/hooks.html
+#
+# Preclude commits that do not conform to various criteria.
+
+fail_fast: true
+
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.0.1
+  hooks: # check for large files, aws credentials and private key files
+   - id: check-added-large-files
+     args: ['--maxkb=200']
+   - id: detect-aws-credentials
+     args: ['--allow-missing-credentials'] # allow hook to pass when no credentials are detected
+   - id: detect-private-key    
+- repo: https://github.com/psf/black
+  rev: 21.12b0
+  hooks: # check conformance to black formatting
+   - id: black 
+     args: ['--check'] # if run without arguments, will fail and will format the files
+- repo: https://gitlab.com/pycqa/flake8
+  rev: 3.9.2
+  hooks: # check conformance to PEP8, flake8 formatting
+   - id: flake8 
+
