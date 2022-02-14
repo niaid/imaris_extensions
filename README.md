@@ -26,6 +26,8 @@ Software development notes:
 
 ## Extensions Listing
 
+> :warning: **Corrupt files** will cause the extensions to fail with an error message "*...OSError: Can't read data (inflate() failed)*". In some cases imaris is able to read such files while the extensions fail to do so. A solution, that often works, is to read the file into imaris and then "Save as" to a new file which can then be read by the extensions.
+
 ### Algorithms
   1. [XTRegisterSameChannel](http://niaid.github.io/imaris_extensions/XTRegisterSameChannel.html) - Registration of 2D or 3D images that share a common channel (correlation based affine alignment). Sample datasets are freely available on zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4632320.svg)](https://doi.org/10.5281/zenodo.4632320). A video illustrating the usage of the extension is available on [YouTube](https://www.youtube.com/watch?v=rrCajI8jroE).
   2. [XTChannelArithmetic](http://niaid.github.io/imaris_extensions/XTChannelArithmetic.html) - Perform channel arithmetic, and more advanced channel manipulations via short SimpleITK expressions (short SimpleITK programs).
