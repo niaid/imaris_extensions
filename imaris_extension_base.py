@@ -19,7 +19,7 @@
 from PySide2.QtWidgets import QMainWindow, QErrorMessage
 from PySide2.QtCore import Signal, QObject
 import PySide2.QtGui
-
+import SimpleITK as sitk
 import logging
 
 # The PySide2 Qt applications support multiple styles (look and feels).
@@ -50,6 +50,61 @@ class ImarisExtensionBase(QMainWindow):
     def _processing_error_function(self, message):
         self.processing_error = True
         self._error_function(message)
+
+
+class SimpleITKLogger(sitk.LoggerBase):
+    """
+    Adapter between the SimpleITK/ITK logging and the Python logging framework. Enables handling of messages
+    coming from ITK and SimpleTK via Python logging. Original code copied from the SimpleITK Examples/Logging.
+
+    To use the adapter the LoggerBase.SetAsGlobalITKLogger method must be called, either explicitly in the code
+    or implicitly when the adapter is used as a context manager (__enter__ and __exit__ methods). If explicitly
+    setting a SimpleITKLogger as the global ITK logger, you may want to hold on to the original
+    ITK logger returned by the SetAsGlobalITKLogger and restore it to the original state at a later point in the code.
+
+    To enable detailed debugging information from SimpleITK objects, if available, turn the "Debug" property on
+    (object's DebugOn(), DebugOff() methods).
+    """
+
+    def __init__(self, logger):
+        """
+        Initializes with a Logger object to handle the messages emitted from SimpleITK/ITK.
+        """
+        super(SimpleITKLogger, self).__init__()
+        self._logger = logger
+
+    @property
+    def logger(self):
+        return self._logger
+
+    @logger.setter
+    def logger(self, logger):
+        self._logger = logger
+
+    def __enter__(self):
+        self._old_logger = self.SetAsGlobalITKLogger()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._old_logger.SetAsGlobalITKLogger()
+        del self._old_logger
+
+    def DisplayText(self, s):
+        # Remove newline endings from SimpleITK/ITK messages since the
+        # Python logger adds them.
+        self._logger.info(s.rstrip())
+
+    def DisplayErrorText(self, s):
+        self._logger.error(s.rstrip())
+
+    def DisplayWarningText(self, s):
+        self._logger.warning(s.rstrip())
+
+    def DisplayGenericOutputText(self, s):
+        self._logger.info(s.rstrip())
+
+    def DisplayDebugText(self, s):
+        self._logger.debug(s.rstrip())
 
 
 class LoggingGUIHandler(logging.Handler):
