@@ -234,6 +234,13 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
         self.logging_handler.signal_emitter.write_signal.connect(
             self.__update_registration_stdout_edit
         )
+        # Create SimpleITK logger to Python logger adapter, enable
+        # all ITK debug messages and configure ITK to use the adaptor. No
+        # need to keep a reference to the old logger as we want all ITK
+        # notifications to be logged throughout the program execution.
+        self.sitk_logger = ieb.SimpleITKLogger(sitkibex.globals.logger)
+        sitk.ProcessObject.GlobalDefaultDebugOn()
+        self.sitk_logger.SetAsGlobalITKLogger()
 
         self.resample_images.progress_signal.connect(self.__on_resample_progress)
         self.resample_images.finished.connect(self.__resampling_finished)
