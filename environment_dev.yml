@@ -21,6 +21,6 @@ dependencies:
   - pre-commit #only used for development, multi-language pre commit hooks
   - pip
   - pip:
-    - https://github.com/niaid/sitk-ibex/releases/download/v0.3/sitkibex-0.3-py3-none-any.whl #sitk-ibex registration
+    - https://github.com/niaid/sitk-ibex/releases/download/v0.4/sitkibex-0.4-py3-none-any.whl #sitk-ibex registration
     - QDarkStyle #dark stylesheet for Qt applications
     - black #only used for development, code formatting
