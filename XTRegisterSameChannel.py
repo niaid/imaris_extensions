@@ -601,11 +601,13 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
     def __configure_and_show_registration_setup_widget(self):
         problematic_images = []
         self.all_channels = []
+        pixel_types = []
         file_names = self.input_files_edit.toPlainText().split("\n")
         channel_prefix_separator = self.channel_prefix_separator_line_edit.text()
         image_resolutions = []
         for file_name in file_names:
             metadata = sio.read_metadata(file_name)
+            pixel_types.append(sio.supported_pixel_types[metadata["sitk_pixel_type"]])
             image_resolutions.append(len(metadata["sizes"]))
             current_channel_names = [
                 (channel_info["name"].split(channel_prefix_separator)[-1]).strip()
@@ -620,6 +622,18 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
             # created the last repetition of the channel name is kept, previous ones are overwritten)
             if len(current_channel_names) != len(self.all_channels[-1]):
                 problematic_images.append(file_name)
+        # All images are expected to have the same pixel type
+        if len(set(pixel_types)) != 1:
+            self._error_function(
+                "Images have different pixel types (not allowed):\n"
+                + "\n".join(
+                    [
+                        f"{fname}: {ptype}"
+                        for ptype, fname in zip(pixel_types, file_names)
+                    ]
+                )
+            )
+            return
         if problematic_images:
             self._error_function(
                 "The following files contain multiple channels with same name (not allowed): "
