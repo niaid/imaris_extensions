@@ -1,7 +1,7 @@
 ## SimpleITK Imaris Extensions
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) &nbsp;&nbsp;
-![ubuntu / macos / windows (Python 3.7, 3.8)](https://github.com/niaid/imaris_extensions/actions/workflows/main.yml/badge.svg)
+![ubuntu / macos / windows (Python 3.7, 3.10)](https://github.com/niaid/imaris_extensions/actions/workflows/main.yml/badge.svg)
 &nbsp;&nbsp;[![https://niaid.github.io/imaris_extensions/](https://img.shields.io/website-up-down-brightgreen-red/http/shields.io.svg)](https://niaid.github.io/imaris_extensions/)
 
 This repository contains extensions, plugins, for the [Imaris](https://imaris.oxinst.com/) (Oxford Instruments) microscopy image analysis program. They either provide additional image analysis capabilities via the open source [SimpleITK](https://simpleitk.org) image analysis library, or are utilities that allow the user to easily modify meta-data associated with images stored in the Imaris file format (e.g. channel names, colors).
@@ -11,8 +11,9 @@ The extensions are designed so that they can be run either as independent progra
 Software development notes:
 
 1. We use the [black code formatter](https://github.com/psf/black) to ensure uniform code style.
-2. The code is tested on Linux/OSX/Windows with Python versions 3.7 and 3.8.
+2. The code is tested on Linux/OSX/Windows with Python versions 3.7 and 3.10.
 3. As the testing data is rather large, we use [git-lfs](https://git-lfs.github.com/). To obtain the data using standard git commands you will have to install git-lfs on your system.
+4. Details on how to contribute can be found [here](CONTRIBUTING.md).
 
 ## Downloading and Updating
 
