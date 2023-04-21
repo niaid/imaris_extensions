@@ -1,0 +1,27 @@
+{
+    "description": "<p>This repository contains extensions, plugins, for the <a href=\"https://imaris.oxinst.com/\">Imaris</a> (Oxford Instruments) microscopy image analysis program. They either provide additional image analysis capabilities via the open source <a href=\"https://www.simpleitk.org\">SimpleITK</a> image analysis library, or are utilities that allow the user to easily modify meta-data associated with images stored in the Imaris file format (e.g. channel names, colors).</p><p>The extensions are designed so that they can be run either as independent programs or via the Imaris extension mechanism. When run as independent programs they can be used on any of the standard operating systems (Windows/OSX/Linux).</p><p>This work has been funded in part with federal funds from the National Institute of Allergy and Infectious Diseases, National Institutes of Health, under BCBB Support Services Contract HHSN316201300006W/75N93022F00001 to Medical Science and Computing.</p>",
+    "keywords": [
+        "Open Science",
+        "Open Source Software"
+        "Microscopy",
+        "Multiplexed Optical Imaging",
+        "Image Analysis",
+    ],
+    "license": {
+        "id": "CC-BY-4.0"
+    },
+    "title": "SimpleITK Imaris Extensions",
+    "upload_type": "software",
+    "creators": [
+        {
+            "affiliation": "National Institutes of Health",
+            "name": "Yaniv, Ziv",
+            "orcid": "0000-0003-0315-7727"
+        },
+        {
+            "affiliation": "National Institutes of Health",
+            "name": "Lowekamp, Bradley",
+            "orcid": "0000-0002-4579-5738"
+        },
+    ],
+}
