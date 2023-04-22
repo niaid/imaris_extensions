@@ -29,6 +29,12 @@ Software development notes:
     git pull
     ```
 
+## How to Cite
+
+If you find these extensions useful in your research, support our efforts by citing it as:
+
+Z. Yaniv, B. Lowekamp, "SimpleITK Imaris Extensions", doi: [10.5281/zenodo.7854019](https://doi.org/10.5281/zenodo.7854019).
+
 ## Extensions Listing
 
 > :warning: **Corrupt files** will cause the extensions to fail with an error message "*...OSError: Can't read data (inflate() failed)*". In some cases imaris is able to read such files while the extensions fail to do so. A solution, that often works, is to read the file into imaris and then "Save as" to a new file which can then be read by the extensions.
