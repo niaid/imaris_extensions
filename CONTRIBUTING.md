@@ -63,3 +63,7 @@ git lfs track "*.onnx"
 git add segmentation_model.onnx
 git commit -m "Adding basic segmentation model weights."
 ```
+
+## Credit where credit is due
+
+If you haven't already done so, add your details to the contributer's list in the [.zenodo.json](.zenodo.json) file.
