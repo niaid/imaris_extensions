@@ -11,4 +11,5 @@ docutils   #used for converting rst to html (see help_dialog.py)
 pygments   #used for code highlighting (see help_dialog.py)
 qdarkstyle #dark stylesheet for Qt applications
 matplotlib
-https://github.com/niaid/sitk-ibex/releases/download/v0.4/sitkibex-0.4-py3-none-any.whl #sitk-ibex registration
+sitkibex
+
