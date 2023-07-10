@@ -203,6 +203,32 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
     is projected along the z-direction using a mean projection, affine registration is performed in
     2D and then the z-stacks are aligned in the z-direction so that their centers are aligned.
 
+    Results with artifacts
+    ++++++++++++++++++++++
+
+    In some cases we have observed that registration appears to work, but the final result contains
+    strange artifacts even though the input images **appear to be visually valid**. An example result
+    with artifacts is shown below (image courtesy Dr. Andrea Radtke):
+
+    .. figure:: docs/images/registration_result_from_courrpt_input.jpeg
+       :alt: registration result from corrupt input
+
+    This is not a problem with the registration or resampling, it is a problem with the input. The original
+    image is already corrupt. We have identified that this happens when the image is imported into imaris
+    from its original file format and the resulting imaris file is saved to a network or external drive.
+    **Copy the original image to the local drive, import into imaris and save to local drive, problem solved.**
+
+    | I want to know more:
+    |   **Q**: Why does my original image appear to be visually valid and yet you claim it is corrupt?
+    |   **A**: The imaris file format is hierarchical, an image pyramid. When we open an image in imaris we are looking
+        at a low resolution version of the image, close to the apex of the pyramid. These images are usually
+        very small and are saved correctly over the network. When we zoom into the image, the imaris viewer will
+        switch to a higher resolution version of the image from the pyramid. The closer we get to the base the
+        larger the image and the higher the chance that it be corrupted when saving over the network. The registration
+        uses the base image (highest resolution) and resamples it, and thus exposes that the image is
+        corrupt.
+    |   Don't trust us? If your registration result exhibits artifacts, open your original image in imaris and
+        zoom in, the artifacts will "magically" appear.
     """  # noqa
 
     def __init__(self):
