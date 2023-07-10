@@ -37,9 +37,17 @@ Z. Yaniv, B. Lowekamp, "SimpleITK Imaris Extensions", doi: [10.5281/zenodo.78540
 
 ## Extensions Listing
 
-> :warning: **Corrupt files** will cause the extensions to fail with an error message "*...OSError: Can't read data (inflate() failed)*". In some cases imaris is able to read such files while the extensions fail to do so. A solution, that often works, is to read the file into imaris and then "Save as" to a new file which can then be read by the extensions.
+---
 
-> :warning: **Out of memory errors** will cause the extensions to fail with an error message along the lines of "*...Failed to allocate memory for image.*". The minimal RAM size required to run an extension depends on the image sizes and the specific extension in use. For common image sizes, **16GB of RAM** is often sufficient, **64GB or more** is desirable. If memory size is not sufficient, consider increasing the size of the machine's [virtual memory](https://en.wikipedia.org/wiki/Virtual_memory). Experience has shown us that some extensions, e.g. `XTChannelArithmetic`, do work on systems with only **8GB of RAM** when configured appropriately (using a memory efficient slice-by-slice processing at the cost of longer runtimes).
+**WARNINGS**
+
+Avoid converting files into imaris format using a network or external drive, this has the potential to produce corrupt files that are hard to identify as such (unless you enjoy hours of debugging). This issue is not specific to the work found here. For more details see the [XTRegisterSameChannel documentation](http://niaid.github.io/imaris_extensions/XTRegisterSameChannel.html).
+
+**Corrupt files** will cause the extensions to fail with an error message "*...OSError: Can't read data (inflate() failed)*". In some cases imaris is able to read such files while the extensions fail to do so. A solution, that often works, is to read the file into imaris and then "Save as" to a new file which can then be read by the extensions.
+
+**Out of memory errors** will cause the extensions to fail with an error message along the lines of "*...Failed to allocate memory for image.*". The minimal RAM size required to run an extension depends on the image sizes and the specific extension in use. For common image sizes, **16GB of RAM** is often sufficient, **64GB or more** is desirable. If memory size is not sufficient, consider increasing the size of the machine's [virtual memory](https://en.wikipedia.org/wiki/Virtual_memory). Experience has shown us that some extensions, e.g. `XTChannelArithmetic`, do work on systems with only **8GB of RAM** when configured appropriately (using a memory efficient slice-by-slice processing at the cost of longer runtimes).
+
+---
 
 ### Algorithms
   1. [XTRegisterSameChannel](http://niaid.github.io/imaris_extensions/XTRegisterSameChannel.html) - Registration of 2D or 3D images that share a common channel (correlation based affine alignment). Sample datasets are freely available on zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4632320.svg)](https://doi.org/10.5281/zenodo.4632320). A video illustrating the usage of the extension is available on [YouTube](https://www.youtube.com/watch?v=rrCajI8jroE).

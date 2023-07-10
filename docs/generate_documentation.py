@@ -50,6 +50,8 @@ with tempfile.TemporaryDirectory() as tmpdirname:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         with open(os.path.join(tmpdirname, f_name[:-3] + ".rst"), "w") as fp:
-            fp.write(inspect.getdoc(getattr(module, attribute_name)))
+            rst_content = inspect.getdoc(getattr(module, attribute_name))
+            # update all paths to images and write to file
+            fp.write(rst_content.replace("docs/images", "../docs/images"))
             fp.flush()
             os.system(f"pandoc -s {fp.name} -o {f_name[:-3]}.html -c {css_file_name}")
