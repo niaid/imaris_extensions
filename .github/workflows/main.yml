@@ -100,13 +100,14 @@ jobs:
     - name: Update documentation
       run: |
         python docs/generate_documentation.py
+        ls -la
     - name: Commit and push
       shell: bash
       run: |
         if ! git diff --quiet; then
           git config --local user.email "$(git log --format='%ae' HEAD^!)"
           git config --local user.name "$(git log --format='%an' HEAD^!)"
-          git add docs/*
+          git add docs/*.html
           git commit -m "Adding extension documentation."
           git push
         fi
