@@ -95,7 +95,8 @@ jobs:
       run: |
         python docs/generate_documentation.py
     - name: Commit and push
-        shell: bash
+      shell: bash
+      run: |
         if ! git diff --quiet; then
           git config --local user.email "$(git log --format='%ae' HEAD^!)"
           git config --local user.name "$(git log --format='%an' HEAD^!)"
