@@ -94,13 +94,15 @@ jobs:
     - name: Update documentation
       run: |
         python docs/generate_documentation.py
-        git checkout -b gh-pages origin/gh-pages
-        git config --local user.email "$(git log --format='%ae' HEAD^!)"
-        git config --local user.name "$(git log --format='%an' HEAD^!)"
-        mv -f docs/*.html .
-        git add *.html
-        git commit --amend --no-edit
-        git push origin gh-pages --force
+    - name: Commit and push
+        shell: bash
+        if ! git diff --quiet; then
+          git config --local user.email "$(git log --format='%ae' HEAD^!)"
+          git config --local user.name "$(git log --format='%an' HEAD^!)"
+          git add docs/*
+          git commit -m "Adding extension documentation."
+          git push
+        fi
 
   github_release:
     needs: test
