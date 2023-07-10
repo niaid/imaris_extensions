@@ -4,11 +4,17 @@ on:
   push:
     branches:
       - main
+    paths-ignore: # ignore auto-generated files, only run when source files change
+      - docs/*.html
     tags:
       - "v*.*.*"
   pull_request:
     branches:
       - main
+    paths-ignore: # ignore auto-generated files, only run when source files change
+      - docs/*.html
+  # Enable manual running of workflow, so we can force execution
+  workflow_dispatch:
 
 jobs:
 
