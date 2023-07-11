@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Export Channel Settings</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="midnight-green.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Export Channel Settings</h1>
+</header>
+<p><a href="https://github.com/niaid/imaris_extensions">View on GitHub</a></p>
+<p>This program enables you to export the channel settings from an imaris file to a comma separated values (csv) file. This is convenient for manual editing. Once modified the settings file can be applied to other imaris files using the <a href="http://niaid.github.io/imaris_extensions/XTConfigureChannelSettings.html">Configure Channel Settings extension</a>.</p>
+<p>Note: If the exported settings include color tables, these are exported as additional files that are referenced in the csv file.</p>
+<p>Example output csv file content:</p>
+<pre><code>name,description,color,alpha,range,gamma
+Cytoplasm, first channel description,&quot;0.0, 76.5, 0.0&quot;,1.0,&quot;22.836, 162.388&quot;,1.0
+Nucleus,second channel description,glow_color_table.pal,1.0,&quot;72.272, 158.038&quot;,1.0
+Vesicles,third channel description,&quot;255.0,0.0,0.0&quot;,1.0,&quot;62.164, 150.97&quot;,1.0</code></pre>
+<p>The second channel used a color table instead of a single color. The file containing the color table is specified using a relative path. The contents of a color table file are triplets, RGB values, in [0,255]. The specific file with 256 entries looks like this:</p>
+<pre><code>0.000 0.000 0.000
+0.000 0.000 0.000
+4.080 0.000 0.000
+4.080 0.000 0.000
+7.905 0.000 0.000
+7.905 0.000 0.000
+11.985 0.000 0.000
+11.985 0.000 4.080
+16.065 0.000 4.080
+16.065 0.000 4.080
+19.890 0.000 4.080
+19.890 0.000 4.080
+...
+...
+250.920 250.920 235.110
+250.920 250.920 238.935
+250.920 250.920 243.015
+250.920 250.920 243.015
+250.920 250.920 247.095
+255.000 255.000 255.000</code></pre>
+</body>
+</html>

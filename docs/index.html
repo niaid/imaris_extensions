@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>SimpleITK Imaris Extensions</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="midnight-green.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">SimpleITK Imaris Extensions</h1>
+</header>
+<h2 id="simpleitk-imaris-extensions">SimpleITK Imaris Extensions</h2>
+<p><a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a>    <img src="https://github.com/niaid/imaris_extensions/actions/workflows/main.yml/badge.svg" alt="ubuntu / macos / windows (Python 3.7, 3.10)" />   <a href="https://niaid.github.io/imaris_extensions/"><img src="https://img.shields.io/website-up-down-brightgreen-red/http/shields.io.svg" alt="https://niaid.github.io/imaris_extensions/" /></a></p>
+<p>This repository contains extensions, plugins, for the <a href="https://imaris.oxinst.com/">Imaris</a> (Oxford Instruments) microscopy image analysis program. They either provide additional image analysis capabilities via the open source <a href="https://simpleitk.org">SimpleITK</a> image analysis library, or are utilities that allow the user to easily modify meta-data associated with images stored in the Imaris file format (e.g. channel names, colors).</p>
+<p>The extensions are designed so that they can be run either as independent programs or via the Imaris extension mechanism. When run as independent programs they can be used on any of the standard operating systems (Windows/OSX/Linux).</p>
+<p>Software development notes:</p>
+<ol type="1">
+<li>We use the <a href="https://github.com/psf/black">black code formatter</a> to ensure uniform code style.</li>
+<li>The code is tested on Linux/OSX/Windows with Python versions 3.7 and 3.10.</li>
+<li>As the testing data is rather large, we use <a href="https://git-lfs.github.com/">git-lfs</a>. To obtain the data using standard git commands you will have to install git-lfs on your system.</li>
+<li>Details on how to contribute can be found <a href="CONTRIBUTING.md">here</a>.</li>
+</ol>
+<h2 id="downloading-and-updating">Downloading and Updating</h2>
+<ol type="1">
+<li>Using zip files:<br />
+Download <a href="https://github.com/niaid/imaris_extensions/archive/refs/heads/main.zip">code zip file</a> and <a href="https://github.com/niaid/imaris_extensions/archive/refs/heads/gh-pages.zip">documentation as zip file</a>. Replace older versions with the contents of these zip files.</li>
+<li>Using git:<br />
+Initially, clone repository using git (with GitHub account): <code>git clone https://github.com/niaid/imaris_extensions.git</code> Update: <code>git pull</code></li>
+</ol>
+<h2 id="how-to-cite">How to Cite</h2>
+<p>If you find these extensions useful in your research, support our efforts by citing it as:</p>
+<p>Z. Yaniv, B. Lowekamp, “SimpleITK Imaris Extensions”, doi: <a href="https://doi.org/10.5281/zenodo.7854019">10.5281/zenodo.7854019</a>.</p>
+<h2 id="extensions-listing">Extensions Listing</h2>
+<hr />
+<p><strong>WARNINGS</strong></p>
+<p>Avoid converting files into imaris format using a network or external drive, this has the potential to produce corrupt files that are hard to identify as such (unless you enjoy hours of debugging). This issue is not specific to the work found here. For more details see the <a href="XTRegisterSameChannel.html">XTRegisterSameChannel documentation</a>.</p>
+<p><strong>Corrupt files</strong> will cause the extensions to fail with an error message “<em>…OSError: Can’t read data (inflate() failed)</em>”. In some cases imaris is able to read such files while the extensions fail to do so. A solution, that often works, is to read the file into imaris and then “Save as” to a new file which can then be read by the extensions.</p>
+<p><strong>Out of memory errors</strong> will cause the extensions to fail with an error message along the lines of “<em>…Failed to allocate memory for image.</em>”. The minimal RAM size required to run an extension depends on the image sizes and the specific extension in use. For common image sizes, <strong>16GB of RAM</strong> is often sufficient, <strong>64GB or more</strong> is desirable. If memory size is not sufficient, consider increasing the size of the machine’s <a href="https://en.wikipedia.org/wiki/Virtual_memory">virtual memory</a>. Experience has shown us that some extensions, e.g. <code>XTChannelArithmetic</code>, do work on systems with only <strong>8GB of RAM</strong> when configured appropriately (using a memory efficient slice-by-slice processing at the cost of longer runtimes).</p>
+<hr />
+<h3 id="algorithms">Algorithms</h3>
+<ol type="1">
+<li><a href="http://niaid.github.io/imaris_extensions/XTRegisterSameChannel.html">XTRegisterSameChannel</a> - Registration of 2D or 3D images that share a common channel (correlation based affine alignment). Sample datasets are freely available on zenodo <a href="https://doi.org/10.5281/zenodo.4632320"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.4632320.svg" alt="DOI" /></a>. A video illustrating the usage of the extension is available on <a href="https://www.youtube.com/watch?v=rrCajI8jroE">YouTube</a>.</li>
+<li><a href="XTChannelArithmetic.html">XTChannelArithmetic</a> - Perform channel arithmetic, and more advanced channel manipulations via short SimpleITK expressions (short SimpleITK programs).</li>
+<li><a href="XTVirtualHEStain.html">XTVirtualHEStain</a> - Create a virtual H&amp;E stain from a fluoresence image and add the RGB image as three new channels to the original image.</li>
+<li>More to come.</li>
+</ol>
+<h3 id="utilities">Utilities</h3>
+<ol type="1">
+<li><a href="XTConfigureChannelSettings.html">XTConfigureChannelSettings</a> - Configure channel settings, name, description and visualization configuration specified via a csv file or an Imaris file.</li>
+<li><a href="XTExportChannelSettings.html">XTExportChannelSettings</a> - Export channel settings, name, description and visualization configuration to a csv file. The resulting csv file can be easily edited and then applied to other imaris files using the XTConfigureChannelSettings extension.</li>
+<li>More to come.</li>
+</ol>
+<h2 id="setup">Setup</h2>
+<ol type="1">
+<li>Install a Python environment.<br />
+The specific Python version you need depends on your version of Imaris (for us this is Python 3.7.0). Running the extensions as independent programs is less restrictive, requiring the use of Python version 3.6 or above.[<a href="https://docs.conda.io/en/latest/miniconda.html">Miniconda download</a> or <a href="https://www.python.org/downloads/">plain Python download</a>].</li>
+<li>Configure and install the required Python packages.</li>
+</ol>
+<p>If using Miniconda/Anaconda:</p>
+<ul>
+<li><strong>On Windows</strong>: open the Anaconda Prompt (found under the Anaconda3 start menu).</li>
+<li><strong>On Linux/OSX</strong>: on the command line <code>source path_to_your_anaconda3/bin/activate base</code></li>
+</ul>
+<pre><code>  cd path_to_your_extensions_directory
+  conda env create -f environment.yml</code></pre>
+<p>If using plain Python:</p>
+<p>Open the command line (a.k.a. command prompt, terminal):</p>
+<pre><code>cd path_to_your_extensions_directory
+python -m pip install --upgrade pip
+pip install requirements.txt</code></pre>
+<ol start="3" type="1">
+<li><p>Configure Imaris to point to your Python executable and to the directory containing the extensions (see Imaris manual).<br />
+<strong>Note</strong>: this is an optional step, if you don’t have the Imaris software on the specific machine you can still run the extensions.</p></li>
+<li><p>Edit one of these files, set the path to your Python executable:<br />
+<strong>Windows</strong>: <code>run_extensions.bat</code><br />
+<strong>OSX/Linux</strong>: <code>run_extensions.sh</code></p></li>
+<li><p>Run the relevant script:</p>
+<p><strong>Windows</strong>: double click the <code>run_extensions.bat</code>.</p>
+<p><strong>OSX/Linux</strong>: from a terminal, make the script executable <code>chmod +x run_extensions.sh</code> and run it <code>./run_extensions.sh</code>.</p>
+<p><strong>Bonus</strong>: On OSX, you can configure things so that double clicking the script in Finder will run it. In Finder,</p>
+<ol type="1">
+<li>Right-click the run_extensions.sh file and select “Open with” and then “Other…”</li>
+<li>Change the “Enable” dropdown menu from “Recommended Applications” to “All Applications”.</li>
+<li>Search for “Terminal” and select it (check the “Always Open With” if you want all shell scripts to be run via terminal, otherwise leave it unchecked).</li>
+</ol></li>
+</ol>
+</body>
+</html>

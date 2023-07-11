@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Channel Arithmetic and Beyond</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="midnight-green.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Channel Arithmetic and Beyond</h1>
+</header>
+<p><a href="https://github.com/niaid/imaris_extensions">View on GitHub</a></p>
+<p>This program enables one to specify arithmetic expressions which are used to create new channels. The basic arithmetic operations are supported: +,-,*,/,**. More advanced operations that run short <a href="https://simpleitk.org/">SimpleITK</a> code snippets are also supported.</p>
+<p>Channels are referenced using square brackets and the channel index, starting at <strong>zero</strong>. To apply an expression to all channels, use the channel index 'i'.</p>
+<p>When creating a single new channel, the arithmetic expression consists of literal channel numbers, one can select a name and color for the new channel. When creating multiple new channels, the arithmetic expression is applied to all channels, the postfix '_modified' is appended to the original channel names and the original color is copied over. Note that for all channels created by the program the channel description will include the arithmetic expression used to create that channel. This transparently supports your efforts to conduct reproducible research.</p>
+<p>Because an Imaris image has a specific pixel type (8, 16, 32 bit unsigned integer and 32 bit floating point) all computations are performed using a 32 bit floating point representation and then clamped to the range of the image's pixel type.</p>
+<p>The program allows you to use the same expression on multiple files. In this case literal channel values are limited by the number of shared channels. Thus, if working with two files one with three channels and one with four channels, the valid literal channel values are limited to 0, 1, 2. We cannot use 3 as it does not exist in all files. On the other hand, if our autofluorescence channel is one of these channels, e.g. channel 0, we can subtract it from all channels in both files, <span class="title-ref">[i]-[0]</span>.</p>
+<h1 id="basic-examples">Basic Examples</h1>
+<p>Multiply channels zero and three:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>[<span class="dv">0</span>]<span class="op">*</span>[<span class="dv">3</span>]</span></code></pre></div>
+<p>Multiply channels zero and three and subtract the result from channel four:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>[<span class="dv">4</span>] <span class="op">-</span> ([<span class="dv">0</span>]<span class="op">*</span>[<span class="dv">3</span>])</span></code></pre></div>
+<p>Duplicate all channels:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>[i]</span></code></pre></div>
+<p>Subtract channel zero from all channels:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>[i]<span class="op">-</span>[<span class="dv">0</span>]</span></code></pre></div>
+<h1 id="advanced-examples">Advanced Examples</h1>
+<p>Threshold channel one using a value of 100, resulting image is binary values in {0,1}:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>[<span class="dv">1</span>]<span class="op">&gt;</span><span class="dv">100</span></span></code></pre></div>
+<p>Threshold a specific channel to create a binary result using the Otsu filter:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>sitk.OtsuThreshold([<span class="dv">1</span>], <span class="dv">0</span>, <span class="dv">1</span>)</span></code></pre></div>
+<p>Threshold a specific channel retaining the values above the threshold:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>sitk.Cast([<span class="dv">1</span>]<span class="op">&gt;</span><span class="dv">100</span>, sitk.sitkFloat32)<span class="op">*</span>[<span class="dv">1</span>]</span></code></pre></div>
+<p>Threshold a specific channel, get all connected components, then sort the components according to size, discarding those smaller than a minimum size and create a binary mask corresponding to the largest component, which is the first label(second largest component label is 2 etc.)</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>sitk.RelabelComponent(sitk.ConnectedComponent([<span class="dv">1</span>]<span class="op">&gt;</span><span class="dv">100</span>), minimumObjectSize <span class="op">=</span> <span class="dv">50</span>)<span class="op">==</span><span class="dv">1</span></span></code></pre></div>
+<p>Create a binary mask representing the colocalization of two channels, intensity values below 20 are considred noise:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>([<span class="dv">1</span>]<span class="op">&gt;</span><span class="dv">20</span>)<span class="op">*</span>([<span class="dv">2</span>]<span class="op">&gt;</span><span class="dv">20</span>)</span></code></pre></div>
+<p>Create a binary mask representing the colocalization of two channels. We are interested in all pixels in channel 2 that have a value above 20 and that are less than 1.0um away from pixels in channel 1 that have a value above 100 (<strong>note</strong>: this operation yields different results when run using a slice-by-slice approach vs. a volumetric approach):</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>(sitk.Cast([<span class="dv">2</span>]<span class="op">&gt;</span><span class="dv">20</span>, sitk.sitkFloat32) <span class="op">*</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a> sitk.Abs(sitk.SignedMaurerDistanceMap([<span class="dv">1</span>]<span class="op">&gt;</span><span class="dv">100</span>, insideIsPositive<span class="op">=</span><span class="va">False</span>, squaredDistance<span class="op">=</span><span class="va">False</span>, useImageSpacing<span class="op">=</span><span class="va">True</span>)))<span class="op">&lt;=</span><span class="fl">1.0</span></span></code></pre></div>
+<p>Create a binary mask using thresholding and then perform morphological closing (dilation followed by erosion) with distance maps, useful for filling holes:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>sitk.SignedMaurerDistanceMap(sitk.SignedMaurerDistanceMap([<span class="dv">1</span>]<span class="op">&gt;</span><span class="dv">100</span>, insideIsPositive<span class="op">=</span><span class="va">False</span>, squaredDistance<span class="op">=</span><span class="va">False</span>, useImageSpacing<span class="op">=</span><span class="va">True</span>) <span class="op">&lt;</span> <span class="fl">1.0</span>, insideIsPositive<span class="op">=</span><span class="va">False</span>, squaredDistance<span class="op">=</span><span class="va">False</span>, useImageSpacing<span class="op">=</span><span class="va">True</span>)<span class="op">&lt;-</span><span class="fl">1.0</span></span></code></pre></div>
+<p>Create a binary mask using thresholding and then perform morphological opening (erosion followed by dilation) with distance maps, useful for removing small islands:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode Python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>sitk.SignedMaurerDistanceMap(sitk.SignedMaurerDistanceMap([<span class="dv">1</span>]<span class="op">&gt;</span><span class="dv">100</span>, insideIsPositive<span class="op">=</span><span class="va">False</span>, squaredDistance<span class="op">=</span><span class="va">False</span>, useImageSpacing<span class="op">=</span><span class="va">True</span>) <span class="op">&lt;</span> <span class="op">-</span><span class="fl">0.2</span>, insideIsPositive<span class="op">=</span><span class="va">False</span>, squaredDistance<span class="op">=</span><span class="va">False</span>, useImageSpacing<span class="op">=</span><span class="va">True</span>)<span class="op">&lt;</span><span class="fl">0.2</span></span></code></pre></div>
+</body>
+</html>
