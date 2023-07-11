@@ -52,6 +52,6 @@ with tempfile.TemporaryDirectory() as tmpdirname:
         with open(os.path.join(tmpdirname, f_name[:-3] + ".rst"), "w") as fp:
             rst_content = inspect.getdoc(getattr(module, attribute_name))
             # update all paths to images and write to file
-            fp.write(rst_content.replace("docs/images", "../docs/images"))
+            fp.write(rst_content.replace("docs/images", "./images"))
             fp.flush()
             os.system(f"pandoc -s {fp.name} -o {f_name[:-3]}.html -c {css_file_name}")
