@@ -22,7 +22,7 @@ extensions_information = [
 # absolute as the website is on a different branch).
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 os.system(
-    f'pandoc -s ../README.md -o index.html -c {css_file_name} --metadata title="SimpleITK Imaris Extensions"'
+    f'pandoc -s ../README.md -o index.html -c {css_file_name} --metadata pagetitle="SimpleITK Imaris Extensions"'
 )
 url_prefix = "http://niaid.github.io/imaris_extensions/"
 with open("index.html", "r") as fp:
