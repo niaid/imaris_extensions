@@ -103,12 +103,14 @@ jobs:
         ls -la docs
     - name: Commit and push
       shell: bash
-      run: |
-        git config --local user.email "$(git log --format='%ae' HEAD^!)"
-        git config --local user.name "$(git log --format='%an' HEAD^!)"
-        git add docs/*.html
-        git commit -m "Adding extension documentation."
-        git push
+      run: | # Only run if the docs changed
+        if ! git diff --quiet *.html; then
+          git config --local user.email "$(git log --format='%ae' HEAD^!)"
+          git config --local user.name "$(git log --format='%an' HEAD^!)"
+          git add docs/*.html
+          git commit -m "Adding extension documentation."
+          git push
+        fi
 
 
   github_release:
