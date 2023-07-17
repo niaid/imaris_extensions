@@ -22,7 +22,8 @@ import glob
 import importlib
 from functools import partial
 import xml.etree.ElementTree as et
-from PySide2.QtWidgets import QApplication, QAction, QLabel, QMainWindow
+from PySide6.QtWidgets import QApplication, QLabel, QMainWindow
+from PySide6.QtGui import QAction
 import qdarkstyle
 
 """
@@ -166,7 +167,7 @@ if __name__ == "__main__":
     app.setStyle(
         "Windows"
     )  # Always use windows style as that is our users' main platform
-    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside2"))
+    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside6"))
 
     # default directory containing extensions is the same as the one containing
     # this script (don't use '.' as that refers to the working directory).
@@ -175,4 +176,4 @@ if __name__ == "__main__":
         if os.path.isdir(dir_name):
             extenstions_directories.append(dir_name)
     driver = ExtensionDriverDialog(extension_paths=extenstions_directories)
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

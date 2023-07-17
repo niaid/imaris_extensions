@@ -16,7 +16,7 @@
 #
 # =========================================================================
 
-from PySide2.QtWidgets import QWidget, QVBoxLayout, QTextBrowser
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextBrowser
 from docutils.core import publish_string
 
 

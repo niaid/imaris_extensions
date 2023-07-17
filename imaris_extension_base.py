@@ -16,19 +16,19 @@
 #
 # =========================================================================
 
-from PySide2.QtWidgets import QMainWindow, QErrorMessage
-from PySide2.QtCore import Signal, QObject
-import PySide2.QtGui
+from PySide6.QtWidgets import QMainWindow, QErrorMessage
+from PySide6.QtCore import Signal, QObject
+import PySide6.QtGui
 import SimpleITK as sitk
 import logging
 
-# The PySide2 Qt applications support multiple styles (look and feels).
+# The PySide6 Qt applications support multiple styles (look and feels).
 # As our user base is primarily on windows we set the style via the
 # extension base class variable to 'Windows'. Thus the extensions look the
 # same on windows or mac.
 # To see what styles are available on a system:
-# import PySide2.QtWidgets; print(PySide2.QtWidgets.QStyleFactory.keys())
-# The 'macintosh' style is only available on OSX.
+# import PySide6.QtWidgets; print(PySide6.QtWidgets.QStyleFactory.keys())
+# The 'macOS' style is only available on OSX.
 style = "Windows"
 
 
@@ -45,7 +45,7 @@ class ImarisExtensionBase(QMainWindow):
         # the '>' symbol. As all invocations of this function are done with plain
         # text we use the convertToPlainText method to ensure that it is displayed
         # correctly.
-        error_dialog.showMessage(PySide2.QtGui.Qt.convertFromPlainText(message))
+        error_dialog.showMessage(PySide6.QtGui.Qt.convertFromPlainText(message))
 
     def _processing_error_function(self, message):
         self.processing_error = True

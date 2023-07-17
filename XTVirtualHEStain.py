@@ -32,7 +32,7 @@ import os
 import inspect
 import traceback
 
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QWidget,
     QApplication,
     QFileDialog,
@@ -46,8 +46,8 @@ from PySide2.QtWidgets import (
     QComboBox,
     QProgressBar,
 )
-from PySide2.QtCore import Qt
-from PySide2.QtCore import QThread, Signal
+from PySide6.QtCore import Qt
+from PySide6.QtCore import QThread, Signal
 import qdarkstyle
 
 import SimpleITK as sitk
@@ -60,9 +60,9 @@ def XTVirtualHEStain(imaris_id=None):
 
     app = QApplication([])
     app.setStyle(ieb.style)  # Consistent setting of style for all applications
-    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside2"))
+    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside6"))
     virtual_stainer_dialog = VirtualHEStainDialog()  # noqa: F841
-    app.exec_()
+    app.exec()
 
 
 class VirtualHEStainDialog(ieb.ImarisExtensionBase):

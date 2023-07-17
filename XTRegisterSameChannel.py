@@ -40,7 +40,7 @@ import matplotlib.pyplot as plt
 import logging
 import traceback
 
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QWidget,
     QApplication,
     QFileDialog,
@@ -56,8 +56,8 @@ from PySide2.QtWidgets import (
     QLineEdit,
     QProgressBar,
 )
-from PySide2.QtCore import Qt, QThread, Signal
-from PySide2.QtGui import QTextCursor
+from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtGui import QTextCursor
 import qdarkstyle
 
 import SimpleITK as sitk
@@ -80,9 +80,9 @@ def file_md5(file_name):
 def XTRegisterSameChannel(imaris_id=None):
     app = QApplication([])
     app.setStyle(ieb.style)  # Consistent setting of style for all applications
-    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside2"))
+    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside6"))
     registration_dialog = RegisterSameChannelDialog()  # noqa: F841
-    app.exec_()
+    app.exec()
 
 
 class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
