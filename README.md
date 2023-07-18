@@ -18,16 +18,25 @@ Software development notes:
 ## Downloading and Updating
 
 1. Using zip file:
-   Download [the zip file](https://github.com/niaid/imaris_extensions/archive/refs/heads/main.zip). Replace older versions with the contents of the zip file (don't forget to keep your older `run_extensions.bat`, `run_extensions.sh` files which you previously modified for your setup).
-2. Using git:  
-   Initially, clone repository using git (with GitHub account):
+   Download the zip file for a [specific release](https://github.com/niaid/imaris_extensions/releases) or the [latest code's zip file](https://github.com/niaid/imaris_extensions/archive/refs/heads/main.zip). Replace older versions with the contents of the zip file (don't forget to keep the `run_extensions.bat`, `run_extensions.sh` files which you previously modified for your setup).
+2. Using git:
+   Initially, clone repository using git (with GitHub account).
     ```
     git clone https://github.com/niaid/imaris_extensions.git
     ```
-   Update:
+   Update to latest code:
     ```
     git pull
     ```
+3. If updating, you will want to remove or rename the existing Python environment:
+   ```
+   conda remove -n imaris --all
+   ```
+   or
+   ```
+   conda rename -n imaris  old_imaris
+   ```
+  Then, recreate the `imaris` environment, step 2 in the [setup instructions below](#setup).
 
 ## How to Cite
 
@@ -63,7 +72,7 @@ Avoid converting files into imaris format using a network or external drive, thi
 
 ## Setup
 
-1. Install a Python environment.  
+1. Install a Python version.
 The specific Python version you need depends on your version of Imaris (for us this is Python 3.7.0). Running the extensions as independent programs is less restrictive, requiring the use of Python version 3.6 or above.[[Miniconda download](https://docs.conda.io/en/latest/miniconda.html)].
 2. Configure and install the required Python packages.
 
