@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>XTRegisterSameChannel</title>
+  <title>Register Multiple Images Using a Common Channel</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -16,6 +16,65 @@
   <link rel="stylesheet" href="midnight-green.css" />
 </head>
 <body>
-<p>QMainWindow(self, parent: Optional[PySide6.QtWidgets.QWidget] = None, flags: PySide6.QtCore.Qt.WindowType = Default(Qt.WindowFlags)) -&gt; None</p>
+<header id="title-block-header">
+<h1 class="title">Register Multiple Images Using a Common Channel</h1>
+</header>
+<p><a href="https://github.com/niaid/imaris_extensions">View on GitHub</a></p>
+<p>This program allows you to register multiple images using <strong>affine</strong> transformations and requires that there be a <strong>common channel</strong> across all images. Registration is based on maximization of correlation, hence the requirement for a common channel. The use of an affine transformation assumes that the images only undergo global transformations, that is, they are rotated, translated, scaled possibly with differnt scales per axis, and sheared. Local deformations are not accounted for.</p>
+<p>The program can be run either as an Imaris extension via the Imaris user interface or as a standalone program. It supports registration of multi-channel z-stacks (a.k.a. 3D images, volumes) and multi-channel 2D images (single slice z-stack). Sample datasets are freely availabe <a href="https://doi.org/10.5281/zenodo.4632320">on zenodo</a>.</p>
+<p>The <a href="https://github.com/niaid/sitk-ibex">source code for the registration</a> is freely available on GitHub. This registration workflow was originally developed as part of the work described in: A. Radtke et al. "IBEX - A versatile multi-plex optical imaging approach for deep phenotyping and spatial analysis of cells in complex tissues", <em>Proc Natl Acad Sci</em>, 2020, <a href="https://doi.org/10.1073/pnas.2018488117">doi:10.1073/pnas.2018488117</a>.</p>
+<h1 id="inputoutput">Input/Output</h1>
+<p>The program's input are two or more files in Imaris format that share at least one common channel. The channel to use for registration is based on the channel names in the file. A channel name consists of three parts:</p>
+<blockquote>
+<ol type="1">
+<li>prefix</li>
+<li>separator character</li>
+<li>postfix</li>
+</ol>
+</blockquote>
+<p>The user can specify a separator character, which indicates that channels with the same postfix are the same channel, otherwise the whole channel name is used. For example, two files with channels named <em>Experiment1 : CD3_AF594</em> and <em>Experiment2 : CD3_AF594</em>. If we specify colon as the separator character these channels will be considered as the same channel, otherwise they are different.</p>
+<p><strong>Note:</strong> Channel names in an input file are expected to be unique, as there can only be one registration channel per file. The uniqueness is based on the separator character scheme described above. For example, a file containing two channels named <em>step 1 : CD3</em> and <em>step 2 : CD3</em> is considered valid if the separator character is empty, but it would be invalid if we use colon or space as the separator character, in which case both channel names become <em>CD3</em>.</p>
+<p>The program will save the following outputs:</p>
+<blockquote>
+<ol type="1">
+<li>A single Imaris file containing the resampled volumes. All channel information is copied over from the original volumes.</li>
+<li>A log file containing internal registration information (useful for debugging purposes understanding why a registration failed and how to configure the program to address the issue).</li>
+<li>A json file specifying the program settings used for registration (useful for reproducing the registration).</li>
+<li>Optional pdf files showing the correlation between channels before and after registration. This is useful for quantitatively evaluating the registration.</li>
+</ol>
+</blockquote>
+<h1 id="program-settings">Program Settings</h1>
+<p>To see the current settings or modify them, press the "Advanced Registration Settings" button on the second screen. You can also load settings from previous registrations via the json configuration saved from a previous run (see above).</p>
+<p>Options include:</p>
+<blockquote>
+<ol type="1">
+<li>z expand factor - Useful when the number of slices in the z-stack is small (~5). Setting this value will expand the number of slices in the stack via interpolation. The expansion utilizes the SimpleITK <a href="https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1ExpandImageFilter.html">ExpandImageFilter</a>.</li>
+<li>FFT based initialization - initialize the translation using the SimpleITK <a href="https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1MaskedFFTNormalizedCorrelationImageFilter.html">MaskedFFTNormalizedCorrelationImageFilter</a>.</li>
+<li>2D affine - project the data along the z direction and perform an initial 2D affine registration which will then be used to initialize a 3D affine registration.</li>
+<li>3D affine - perform 3D affine registration.</li>
+<li>Adjust spacing magnitude to be near 1 - resample the image so that the voxel sizes are not too small, e.g. 0.001. This improves the registration's numerical stability.</li>
+<li>Auto mask - limit voxels used in registration to non zero voxels.</li>
+<li>Samples per parameter - number of samples used during registration.</li>
+</ol>
+</blockquote>
+<h2 id="z-stack-registration">z-stack Registration</h2>
+<p>Most of the time you can run the program using the default registration settings.</p>
+<p><strong>Note:</strong> The first registration step, FFT based initialization, requires a significant amount of RAM. On lower end machines (32GB RAM or less) it may not work. This can be ameliorated by disabling this option and enabling the 2D affine initialization step.</p>
+<p><strong>Failure:</strong> When the FFT based initialization step fails the whole registration may fail too. If this happens, disable the FFT option, enable the 2D affine initialization and redo the registration.</p>
+<h2 id="d-image-registration">2D Image Registration</h2>
+<p>To perform 2D registration use the default settings (2D affine enabled, FFT initialization and 3D affine disabled). If registration doesn't succeed you can try modifying masking and samples per parameter or the selection of the fixed image.</p>
+<p><strong>Note:</strong> Imaris images, including 2D images, are positioned in 3D space. When performing 2D registration we check whether the slices are on the same z-plane (using SimpleITK epsilon). In all cases the images are registered. If they are not on the same plane, a warning about this is provided as part of the registration completion message. It is up to the user to decide whether this is an issue or if this information can be ignored. The resulting 2D image is positioned in 3D space using the z-plane of the fixed image.</p>
+<h2 id="d-registration">2.5D Registration</h2>
+<p>In some rare cases you may want to register a z-stack using a 2.5D approach. That is, the z-stack is projected along the z-direction using a mean projection, affine registration is performed in 2D and then the z-stacks are aligned in the z-direction so that their centers are aligned.</p>
+<h2 id="results-with-artifacts">Results with artifacts</h2>
+<p>In some cases we have observed that registration appears to work, but the final result contains strange artifacts even though the input images <strong>appear to be visually valid</strong>. An example result with artifacts is shown below (image courtesy Dr. Andrea Radtke):</p>
+<figure>
+<img src="./images/registration_result_from_courrpt_input.jpeg" alt="" />
+</figure>
+<p>This is not a problem with the registration or resampling, it is a problem with the input. The original image is already corrupt. We have identified that this happens when the image is imported into imaris from its original file format and the resulting imaris file is saved to a network or external drive. <strong>Copy the original image to the local drive, import into imaris and save to local drive, problem solved.</strong></p>
+<div class="line-block">I want to know more:<br />
+  *<em>Q</em>*: Why does my original image appear to be visually valid and yet you claim it is corrupt?<br />
+  *<em>A</em>*: The imaris file format is hierarchical, an image pyramid. When we open an image in imaris we are looking at a low resolution version of the image, close to the apex of the pyramid. These images are usually very small and are saved correctly over the network. When we zoom into the image, the imaris viewer will switch to a higher resolution version of the image from the pyramid. The closer we get to the base the larger the image and the higher the chance that it be corrupted when saving over the network. The registration uses the base image (highest resolution) and resamples it, and thus exposes that the image is corrupt.<br />
+  Don't trust us? If your registration result exhibits artifacts, open your original image in imaris and zoom in, the artifacts will "magically" appear.</div>
 </body>
 </html>
