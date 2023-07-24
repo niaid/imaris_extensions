@@ -29,17 +29,20 @@
 </ol>
 <h2 id="downloading-and-updating">Downloading and Updating</h2>
 <ol type="1">
-<li>Using zip files:<br />
-Download <a href="https://github.com/niaid/imaris_extensions/archive/refs/heads/main.zip">code zip file</a> and <a href="https://github.com/niaid/imaris_extensions/archive/refs/heads/gh-pages.zip">documentation as zip file</a>. Replace older versions with the contents of these zip files.</li>
-<li>Using git:<br />
-Initially, clone repository using git (with GitHub account): <code>git clone https://github.com/niaid/imaris_extensions.git</code> Update: <code>git pull</code></li>
+<li><p>Using zip file: Download the zip file for a <a href="https://github.com/niaid/imaris_extensions/releases">specific release</a> or the <a href="https://github.com/niaid/imaris_extensions/archive/refs/heads/main.zip">latest code’s zip file</a>. Replace older versions with the contents of the zip file (don’t forget to keep the <code>run_extensions.bat</code>, <code>run_extensions.sh</code> files which you previously modified for your setup).</p></li>
+<li><p>Using git: Initially, clone repository using git (with GitHub account). <code>git clone https://github.com/niaid/imaris_extensions.git</code> Update to latest code: <code>git pull</code></p></li>
+<li><p>If updating, you will want to remove or rename the existing Python environment:</p>
+<pre><code>conda remove -n imaris --all</code></pre>
+<p>or</p>
+<pre><code>conda rename -n imaris  old_imaris</code></pre>
+<p>Then, recreate the <code>imaris</code> environment, step 2 in the <a href="#setup">setup instructions below</a>.</p></li>
 </ol>
 <h2 id="how-to-cite">How to Cite</h2>
 <p>If you find these extensions useful in your research, support our efforts by citing it as:</p>
 <p>Z. Yaniv, B. Lowekamp, “SimpleITK Imaris Extensions”, doi: <a href="https://doi.org/10.5281/zenodo.7854019">10.5281/zenodo.7854019</a>.</p>
 <h2 id="extensions-listing">Extensions Listing</h2>
 <hr />
-<p><strong>WARNINGS</strong></p>
+<p>⚠ <strong>WARNINGS</strong></p>
 <p>Avoid converting files into imaris format using a network or external drive, this has the potential to produce corrupt files that are hard to identify as such (unless you enjoy hours of debugging). This issue is not specific to the work found here. For more details see the <a href="XTRegisterSameChannel.html">XTRegisterSameChannel documentation</a>.</p>
 <p><strong>Corrupt files</strong> will cause the extensions to fail with an error message “<em>…OSError: Can’t read data (inflate() failed)</em>”. In some cases imaris is able to read such files while the extensions fail to do so. A solution, that often works, is to read the file into imaris and then “Save as” to a new file which can then be read by the extensions.</p>
 <p><strong>Out of memory errors</strong> will cause the extensions to fail with an error message along the lines of “<em>…Failed to allocate memory for image.</em>”. The minimal RAM size required to run an extension depends on the image sizes and the specific extension in use. For common image sizes, <strong>16GB of RAM</strong> is often sufficient, <strong>64GB or more</strong> is desirable. If memory size is not sufficient, consider increasing the size of the machine’s <a href="https://en.wikipedia.org/wiki/Virtual_memory">virtual memory</a>. Experience has shown us that some extensions, e.g. <code>XTChannelArithmetic</code>, do work on systems with only <strong>8GB of RAM</strong> when configured appropriately (using a memory efficient slice-by-slice processing at the cost of longer runtimes).</p>
@@ -59,22 +62,15 @@ Initially, clone repository using git (with GitHub account): <code>git clone htt
 </ol>
 <h2 id="setup">Setup</h2>
 <ol type="1">
-<li>Install a Python environment.<br />
-The specific Python version you need depends on your version of Imaris (for us this is Python 3.7.0). Running the extensions as independent programs is less restrictive, requiring the use of Python version 3.6 or above.[<a href="https://docs.conda.io/en/latest/miniconda.html">Miniconda download</a> or <a href="https://www.python.org/downloads/">plain Python download</a>].</li>
+<li>Install a Python version. The specific Python version you need depends on your version of Imaris (for us this is Python 3.7.0). Running the extensions as independent programs is less restrictive, requiring the use of Python version 3.6 or above.[<a href="https://docs.conda.io/en/latest/miniconda.html">Miniconda download</a>].</li>
 <li>Configure and install the required Python packages.</li>
 </ol>
-<p>If using Miniconda/Anaconda:</p>
 <ul>
 <li><strong>On Windows</strong>: open the Anaconda Prompt (found under the Anaconda3 start menu).</li>
 <li><strong>On Linux/OSX</strong>: on the command line <code>source path_to_your_anaconda3/bin/activate base</code></li>
 </ul>
 <pre><code>  cd path_to_your_extensions_directory
   conda env create -f environment.yml</code></pre>
-<p>If using plain Python:</p>
-<p>Open the command line (a.k.a. command prompt, terminal):</p>
-<pre><code>cd path_to_your_extensions_directory
-python -m pip install --upgrade pip
-pip install requirements.txt</code></pre>
 <ol start="3" type="1">
 <li><p>Configure Imaris to point to your Python executable and to the directory containing the extensions (see Imaris manual).<br />
 <strong>Note</strong>: this is an optional step, if you don’t have the Imaris software on the specific machine you can still run the extensions.</p></li>

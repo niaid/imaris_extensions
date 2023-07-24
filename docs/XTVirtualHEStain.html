@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Virtual H&amp;E Staining</title>
+  <title>XTVirtualHEStain</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -16,18 +16,6 @@
   <link rel="stylesheet" href="midnight-green.css" />
 </head>
 <body>
-<header id="title-block-header">
-<h1 class="title">Virtual H&amp;E Staining</h1>
-</header>
-<p><a href="https://github.com/niaid/imaris_extensions">View on GitHub</a></p>
-<p>This program creates a virtual Hematoxylin and Eosin (H&amp;E) image from a fluorescence microscopy image. Similar to H&amp;E staining, where Hematoxylin stains the cell nuclei and Eosin stains the extracellular matrix and cytoplasm, this program creates a virtual H&amp;E image using a fluorescence channel corresponding to a nuclear stain (e.g. DAPI, Hoechest) and a channel which corresponds to the extracellular matrix and cytoplasm (e.g. Desmin-AF488, CD45-AF532).</p>
-<p>This is an implementation of the algorithms described in:</p>
-<ol type="1">
-<li>D. S. Gareau, "The feasibility of digitally stained multimodal confocal mosaics to simulate histopathology", J Biomed Opt, 14(3):03405, 2009, <a href="https://doi.org/10.1117/1.3149853">doi: 10.1117/1.3149853</a>.</li>
-<li>M. G. Giacomelli et al., "Virtual Hematoxylin and Eosin Transillumination Microscopy Using Epi-Fluorescence Imaging", PLoS One, 11(8):e0159337 2016, <a href="https://doi.org/10.1371/journal.pone.0159337">doi: 10.1371/journal.pone.0159337</a>.</li>
-</ol>
-<h1 id="inputoutput">Input/Output</h1>
-<p>The program will allow you to create virtual H&amp;E staining for one or more images. You will need to specify which channel to use as a surrogate for Hematoxylin and which for Eosin. Therefore, if you intend to work on a batch of images, the same surrogates for H&amp;E are expected to appear in all of them (channel equivalence is based on the channels having the same name in all the files).</p>
-<p>The program adds three new channels to the original image simulating the RGB colors of an H&amp;E stain. The channels are named "virtual H&amp;E ch1" (red channel), "virtual H&amp;E ch2" (green channel) and "virtual H&amp;E ch3" (blue channel). Note that the channel description for each of these new channels will include the algorithm used to create it and the surrogate H&amp;E channels it utilized. This transparently supports your efforts to conduct reproducible research.</p>
+<p>QMainWindow(self, parent: Optional[PySide6.QtWidgets.QWidget] = None, flags: PySide6.QtCore.Qt.WindowType = Default(Qt.WindowFlags)) -&gt; None</p>
 </body>
 </html>
