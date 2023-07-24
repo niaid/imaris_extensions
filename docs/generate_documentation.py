@@ -50,7 +50,13 @@ with tempfile.TemporaryDirectory() as tmpdirname:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         with open(os.path.join(tmpdirname, f_name[:-3] + ".rst"), "w") as fp:
-            rst_content = inspect.getdoc(getattr(module, attribute_name))
+            # Bug in PySide6 results in getdoc not working as expected for Qt subclasses:
+            # https://bugreports.qt.io/projects/PYSIDE/issues/PYSIDE-1884?filter=allopenissues
+            # For now use a workaround. Once fixed in PySide6 undo and use original code.
+            # rst_content = inspect.getdoc(getattr(module, attribute_name))
+            rst_content = inspect.cleandoc(
+                getattr(module, attribute_name).__dict__["__doc__"]
+            )
             # update all paths to images and write to file
             fp.write(rst_content.replace("docs/images", "./images"))
             fp.flush()
