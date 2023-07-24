@@ -17,17 +17,26 @@ Software development notes:
 
 ## Downloading and Updating
 
-1. Using zip files:  
-   Download [code zip file](https://github.com/niaid/imaris_extensions/archive/refs/heads/main.zip) and [documentation as zip file](https://github.com/niaid/imaris_extensions/archive/refs/heads/gh-pages.zip). Replace older versions with the contents of these zip files.
-2. Using git:  
-   Initially, clone repository using git (with GitHub account):
+1. Using zip file:
+   Download the zip file for a [specific release](https://github.com/niaid/imaris_extensions/releases) or the [latest code's zip file](https://github.com/niaid/imaris_extensions/archive/refs/heads/main.zip). Replace older versions with the contents of the zip file (don't forget to keep the `run_extensions.bat`, `run_extensions.sh` files which you previously modified for your setup).
+2. Using git:
+   Initially, clone repository using git (with GitHub account).
     ```
     git clone https://github.com/niaid/imaris_extensions.git
     ```
-   Update:
+   Update to latest code:
     ```
     git pull
     ```
+3. If updating, you will want to remove or rename the existing Python environment:
+   ```
+   conda remove -n imaris --all
+   ```
+   or
+   ```
+   conda rename -n imaris  old_imaris
+   ```
+  Then, recreate the `imaris` environment, step 2 in the [setup instructions below](#setup).
 
 ## How to Cite
 
@@ -37,9 +46,10 @@ Z. Yaniv, B. Lowekamp, "SimpleITK Imaris Extensions", doi: [10.5281/zenodo.78540
 
 ## Extensions Listing
 
+
 ---
 
-**WARNINGS**
+&#x26A0; **WARNINGS**
 
 Avoid converting files into imaris format using a network or external drive, this has the potential to produce corrupt files that are hard to identify as such (unless you enjoy hours of debugging). This issue is not specific to the work found here. For more details see the [XTRegisterSameChannel documentation](http://niaid.github.io/imaris_extensions/XTRegisterSameChannel.html).
 
@@ -62,11 +72,9 @@ Avoid converting files into imaris format using a network or external drive, thi
 
 ## Setup
 
-1. Install a Python environment.  
-The specific Python version you need depends on your version of Imaris (for us this is Python 3.7.0). Running the extensions as independent programs is less restrictive, requiring the use of Python version 3.6 or above.[[Miniconda download](https://docs.conda.io/en/latest/miniconda.html) or [plain Python download](https://www.python.org/downloads/)].
+1. Install a Python version.
+The specific Python version you need depends on your version of Imaris (for us this is Python 3.7.0). Running the extensions as independent programs is less restrictive, requiring the use of Python version 3.6 or above.[[Miniconda download](https://docs.conda.io/en/latest/miniconda.html)].
 2. Configure and install the required Python packages.
-
-  If using Miniconda/Anaconda:
 
   * **On Windows**: open the Anaconda Prompt (found under the Anaconda3 start menu).
   * **On Linux/OSX**: on the command line ```source path_to_your_anaconda3/bin/activate base```
@@ -74,15 +82,6 @@ The specific Python version you need depends on your version of Imaris (for us t
   cd path_to_your_extensions_directory
   conda env create -f environment.yml
   ```
-
-  If using plain Python:
-
-  Open the command line (a.k.a. command prompt, terminal):
-```
-cd path_to_your_extensions_directory
-python -m pip install --upgrade pip
-pip install requirements.txt
-```
 3. Configure Imaris to point to your Python executable and to the directory containing the extensions (see Imaris manual).  
  **Note**: this is an optional step, if you don't have the Imaris software on the specific machine you can still run the extensions.
 4. Edit one of these files, set the path to your Python executable:  

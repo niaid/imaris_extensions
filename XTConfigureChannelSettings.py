@@ -37,7 +37,7 @@ import sitk_ims_file_io as sio
 import imaris_extension_base as ieb
 from help_dialog import HelpDialog
 
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QWidget,
     QApplication,
     QFileDialog,
@@ -52,7 +52,7 @@ from PySide2.QtWidgets import (
     QHBoxLayout,
     QErrorMessage,
 )
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 import qdarkstyle
 
 
@@ -60,9 +60,9 @@ def XTBatchConfigureChannelSettings(imaris_id=None):
 
     app = QApplication([])
     app.setStyle(ieb.style)  # Consistent setting of style for all applications
-    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside2"))
+    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside6"))
     channel_settings_dialog = ConfigureChannelSettingsDialog()  # noqa: F841
-    app.exec_()
+    app.exec()
 
 
 class ConfigureChannelSettingsDialog(ieb.ImarisExtensionBase):

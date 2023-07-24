@@ -5,11 +5,11 @@ SimpleITK >= 2.0.0
 numpy
 pandas
 h5py>=2.10.0
-PySide2
+PySide6
 openpyxl
 docutils   #used for converting rst to html (see help_dialog.py)
 pygments   #used for code highlighting (see help_dialog.py)
 qdarkstyle #dark stylesheet for Qt applications
 matplotlib
-sitkibex
+sitkibex #sitk-ibex registration
 

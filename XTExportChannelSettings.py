@@ -34,7 +34,7 @@ import inspect
 import os
 import imaris_extension_base as ieb
 from help_dialog import HelpDialog
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QWidget,
     QApplication,
     QFileDialog,
@@ -46,16 +46,16 @@ from PySide2.QtWidgets import (
     QErrorMessage,
     QLineEdit,
 )
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 import qdarkstyle
 
 
 def XTExportChannelSettings(imaris_id=None):
     app = QApplication([])
     app.setStyle(ieb.style)  # Consistent setting of style for all applications
-    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside2"))
+    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside6"))
     export_channel_settings_dialog = ExportChannelSettingsDialog()  # noqa: F841
-    app.exec_()
+    app.exec()
 
 
 class ExportChannelSettingsDialog(ieb.ImarisExtensionBase):

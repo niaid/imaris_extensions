@@ -34,7 +34,7 @@ import inspect
 import traceback
 import os
 
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QStackedWidget,
     QWidget,
     QApplication,
@@ -52,7 +52,7 @@ from PySide2.QtWidgets import (
     QColorDialog,
     QScrollArea,
 )
-from PySide2.QtCore import Qt, QObject, QRunnable, Signal, QThreadPool
+from PySide6.QtCore import Qt, QObject, QRunnable, Signal, QThreadPool
 import qdarkstyle
 
 import SimpleITK as sitk
@@ -65,9 +65,9 @@ def XTChannelArithmetic(imaris_id=None):
 
     app = QApplication([])
     app.setStyle(ieb.style)  # Consistent setting of style for all applications
-    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside2"))
+    app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside6"))
     channel_arithmetic_dialog = ChannelArithmeticDialog()  # noqa: F841
-    app.exec_()
+    app.exec()
 
 
 class ChannelArithmeticDialog(ieb.ImarisExtensionBase):
