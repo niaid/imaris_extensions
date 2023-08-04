@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+title: "SimpleITK Imaris Extensions"
+message: "If you find this software useful in your work, support our efforts by citing it using the following information."
+type: software
+authors:
+  - family-names: Yaniv
+    given-names: Ziv
+    orcid: 'https://orcid.org/0000-0003-0315-7727'
+  - family-names: Lowekamp
+    given-names: Bradley C.
+    orcid: 'https://orcid.org/0000-0002-4579-5738'
+doi: 10.5281/zenodo.7854019
+url: 'https://github.com/niaid/imaris_extensions'
