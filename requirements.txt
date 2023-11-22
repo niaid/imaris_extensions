@@ -1,7 +1,7 @@
 #
 # Requirements file for SimpleITK Imaris Python 3.7 extensions.
 #
-SimpleITK >= 2.0.0
+SimpleITK == 2.2.1
 numpy
 pandas
 h5py>=2.10.0
