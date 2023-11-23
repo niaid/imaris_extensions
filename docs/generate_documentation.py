@@ -2,7 +2,7 @@ import os
 import sys
 import tempfile
 import inspect
-import importlib
+import importlib.util
 
 css_file_name = "midnight-green.css"
 file_dir_path = os.path.dirname(os.path.abspath(__file__))
