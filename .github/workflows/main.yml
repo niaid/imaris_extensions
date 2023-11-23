@@ -8,13 +8,19 @@ on:
       - docs/*.html
     tags:
       - "v*.*.*"
+
   pull_request:
     branches:
       - main
     paths-ignore: # ignore auto-generated files, only run when source files change
       - docs/*.html
+
   # Enable manual running of workflow, so we can force execution
   workflow_dispatch:
+
+  # run testing on the first of each month 5am ET / 9am UTC
+  schedule:
+  - cron: '0 9 1 * *'
 
 jobs:
 
