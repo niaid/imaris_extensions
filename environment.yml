@@ -6,7 +6,7 @@ dependencies:
   - python=3.7.0 #Python version supported by imaris
   - pip
   - pip:
-    - SimpleITK == 2.2.1
+    - SimpleITK == 2.2.1 #last SimpleITK version providing Python 3.7 binaries
     - numpy
     - pandas
     - h5py>=2.10.0

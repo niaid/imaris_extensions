@@ -1,7 +1,9 @@
 #
-# Requirements file for SimpleITK Imaris Python 3.7 extensions.
+# Requirements file for SimpleITK Imaris extensions.
+# Python 3.7.0 is the Python version supported by imaris. SimpleITK version
+# 2.2.1 is the last version providing binaries for 3.7.0.
 #
-SimpleITK == 2.2.1
+SimpleITK == 2.2.1; python_version == '3.7'
 numpy
 pandas
 h5py>=2.10.0
