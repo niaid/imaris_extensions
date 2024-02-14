@@ -8,9 +8,7 @@
         "Image Analysis",
         "SimpleITK"
     ],
-    "license": {
-        "id": "CC-BY-4.0"
-    },
+    "license": "Apache-2.0",
     "title": "SimpleITK Imaris Extensions",
     "upload_type": "software",
     "creators": [
