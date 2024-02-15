@@ -62,7 +62,6 @@ from help_dialog import HelpDialog
 
 
 def XTChannelArithmetic(imaris_id=None):
-
     app = QApplication([])
     app.setStyle(ieb.style)  # Consistent setting of style for all applications
     app.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyside6"))
@@ -79,7 +78,9 @@ class ChannelArithmeticDialog(ieb.ImarisExtensionBase):
     This program enables one to specify arithmetic expressions which are used to
     create new channels. The basic arithmetic operations are supported: +,-,*,/,**.
     More advanced operations that run short `SimpleITK <https://simpleitk.org/>`_
-    code snippets are also supported.
+    code snippets are also supported. SimpleITK provides `hundreds of filters
+    <https://simpleitk.readthedocs.io/en/master/filters.html>`_ that
+    can be used via this program.
 
     Channels are referenced using square brackets and the channel index, starting
     at **zero**. To apply an expression to all channels, use the channel index 'i'.
@@ -107,97 +108,134 @@ class ChannelArithmeticDialog(ieb.ImarisExtensionBase):
 
     Basic Examples
     --------------
+    #. Multiply channels zero and three:
 
-    Multiply channels zero and three:
+        .. code-block:: Python
 
-    .. code-block:: Python
+            [0]*[3]
 
-      [0]*[3]
+    #. Multiply channels zero and three and subtract the result from channel four:
 
-    Multiply channels zero and three and subtract the result from channel four:
+        .. code-block:: Python
 
-    .. code-block:: Python
+            [4] - ([0]*[3])
 
-      [4] - ([0]*[3])
+    #. Duplicate all channels:
 
-    Duplicate all channels:
+        .. code-block:: Python
 
-    .. code-block:: Python
+            [i]
 
-      [i]
+    #. Subtract channel zero from all channels:
 
-    Subtract channel zero from all channels:
+        .. code-block:: Python
 
-    .. code-block:: Python
+            [i]-[0]
 
-      [i]-[0]
+    #. Invert channel intensity (new intensity values are the result of subtracting the current intensity
+       value from the maximal possible value):
 
+        .. code-block:: Python
+
+            sitk.InvertIntensity([1])
+
+    #. Threshold channel one using a value of 100, resulting image is binary with
+       values in {0,1}:
+
+        .. code-block:: Python
+
+            [1]>100
+
+    #. Threshold a specific channel to create a binary result using the Otsu filter,
+       resulting image is binary with values in {0,1}:
+
+        .. code-block:: Python
+
+            sitk.OtsuThreshold([1], 0, 1)
+
+    #. Gaussian blurring (variance specified in metric units, e.g. nm):
+
+        .. code-block:: Python
+
+            # blur channel 3 using a Gaussian with variance of 0.245 for x, y and z
+            sitk.DiscreteGaussian([3], 0.245)
+            # blur channel 3 using a Gaussian with different variance per x=0.245, y=0.1, z=0.3
+            sitk.DiscreteGaussian([3], [0.245, 0.1, 0.3])
+
+    #. Median filtering using a radius of x=1, y=2 and z=3 (radius in which to compute the
+       median per dimension, pixel units):
+
+        .. code-block:: Python
+
+            sitk.Median([3], [1, 2, 3])
+
+    #. Linearly map the intensity values in the interval [windowMinimum, windowMaximum] to the interval
+       [outputMinimum, outputMaximum]. Values lower than windowMinimum are mapped to outputMinimum. Values
+       higher than windowMaximum are mapped to outputMaximum.
+
+        .. code-block:: Python
+
+            sitk.IntensityWindowing([1], windowMinimum=20, windowMaximum=200, outputMinimum=0, outputMaximum=255)
 
     Advanced Examples
     -----------------
+    #. Threshold a specific channel retaining the values above the threshold and
+       setting all values equal or lower to zero:
 
-    Threshold channel one using a value of 100, resulting image is binary
-    values in {0,1}:
+        .. code-block:: Python
 
-    .. code-block:: Python
+            sitk.Cast([1]>100, sitk.sitkFloat32)*[1]
 
-      [1]>100
+    #. Threshold a specific channel retaining the values above the threshold and
+       setting all values equal or lower to the threshold to an arbitrary value
+       (20 in this example):
 
-    Threshold a specific channel to create a binary result using the Otsu
-    filter:
+        .. code-block:: Python
 
-    .. code-block:: Python
+            sitk.Cast([1]>100, sitk.sitkFloat32)*[1] + sitk.Cast([1]<=100, sitk.sitkFloat32)*20
 
-      sitk.OtsuThreshold([1], 0, 1)
+    #. Threshold a specific channel, get all connected components, then
+       sort the components according to size, discarding those smaller than a minimum
+       size and create a binary mask corresponding to the largest component, which is
+       the first label(second largest component label is 2 etc.):
 
-    Threshold a specific channel retaining the values above the threshold:
+        .. code-block:: Python
 
-    .. code-block:: Python
+            sitk.RelabelComponent(sitk.ConnectedComponent([1]>100), minimumObjectSize = 50)==1
 
-      sitk.Cast([1]>100, sitk.sitkFloat32)*[1]
+    #. Create a binary mask representing the colocalization of two channels,
+       intensity values below 20 are considred noise:
 
-    Threshold a specific channel, get all connected components, then
-    sort the components according to size, discarding those smaller than a minimum
-    size and create a binary mask corresponding to the largest component, which is
-    the first label(second largest component label is 2 etc.)
+        .. code-block:: Python
 
-    .. code-block:: Python
+            ([1]>20)*([2]>20)
 
-      sitk.RelabelComponent(sitk.ConnectedComponent([1]>100), minimumObjectSize = 50)==1
+    #. Create a binary mask representing the colocalization of two channels.
+       We are interested in all pixels in channel 2 that have a value above 20
+       and that are less than 1.0um away from pixels in channel 1 that have a value
+       above 100 (**note**: this operation yields different results when run using
+       a slice-by-slice approach vs. a volumetric approach):
 
-    Create a binary mask representing the colocalization of two channels,
-    intensity values below 20 are considred noise:
+        .. code-block:: Python
 
-    .. code-block:: Python
+            (sitk.Cast([2]>20, sitk.sitkFloat32) *
+            sitk.Abs(sitk.SignedMaurerDistanceMap([1]>100, insideIsPositive=False, squaredDistance=False, useImageSpacing=True)))<=1.0
 
-      ([1]>20)*([2]>20)
+    #. Create a binary mask using thresholding and then perform morphological
+       closing (dilation followed by erosion) with distance maps, useful
+       for filling holes:
 
-    Create a binary mask representing the colocalization of two channels.
-    We are interested in all pixels in channel 2 that have a value above 20
-    and that are less than 1.0um away from pixels in channel 1 that have a value
-    above 100 (**note**: this operation yields different results when run using
-    a slice-by-slice approach vs. a volumetric approach):
+        .. code-block:: Python
 
-    .. code-block:: Python
+            sitk.SignedMaurerDistanceMap(sitk.SignedMaurerDistanceMap([1]>100, insideIsPositive=False, squaredDistance=False, useImageSpacing=True) < 1.0, insideIsPositive=False, squaredDistance=False, useImageSpacing=True)<-1.0
 
-        (sitk.Cast([2]>20, sitk.sitkFloat32) *
-         sitk.Abs(sitk.SignedMaurerDistanceMap([1]>100, insideIsPositive=False, squaredDistance=False, useImageSpacing=True)))<=1.0
+    #. Create a binary mask using thresholding and then perform morphological
+       opening (erosion followed by dilation) with distance maps, useful
+       for removing small islands:
 
-    Create a binary mask using thresholding and then perform morphological
-    closing (dilation followed by erosion) with distance maps, useful
-    for filling holes:
+        .. code-block:: Python
 
-    .. code-block:: Python
-
-      sitk.SignedMaurerDistanceMap(sitk.SignedMaurerDistanceMap([1]>100, insideIsPositive=False, squaredDistance=False, useImageSpacing=True) < 1.0, insideIsPositive=False, squaredDistance=False, useImageSpacing=True)<-1.0
-
-    Create a binary mask using thresholding and then perform morphological
-    opening (erosion followed by dilation) with distance maps, useful
-    for removing small islands:
-
-    .. code-block:: Python
-
-      sitk.SignedMaurerDistanceMap(sitk.SignedMaurerDistanceMap([1]>100, insideIsPositive=False, squaredDistance=False, useImageSpacing=True) < -0.2, insideIsPositive=False, squaredDistance=False, useImageSpacing=True)<0.2
+            sitk.SignedMaurerDistanceMap(sitk.SignedMaurerDistanceMap([1]>100, insideIsPositive=False, squaredDistance=False, useImageSpacing=True) < -0.2, insideIsPositive=False, squaredDistance=False, useImageSpacing=True)<0.2
     """  # noqa
 
     def __init__(self):
