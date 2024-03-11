@@ -162,6 +162,16 @@ class ChannelArithmeticDialog(ieb.ImarisExtensionBase):
             # blur channel 3 using a Gaussian with different variance per x=0.245, y=0.1, z=0.3
             sitk.DiscreteGaussian([3], [0.245, 0.1, 0.3])
 
+    #. Unsharp masking (variance specified in metric units, e.g. nm). This is actually a filter:
+       that emphasizes edges, sharpens the image using a blurred version of the image.
+
+        .. code-block:: Python
+
+            # sharpen channel 0 using an unsharp Gaussian mask with variance of 0.245 and
+            # sharpening increase of 0.5
+            [0]+([0]-sitk.DiscreteGaussian([0], 0.245))*0.5
+
+
     #. Median filtering using a radius of x=1, y=2 and z=3 (radius in which to compute the
        median per dimension, pixel units):
 
