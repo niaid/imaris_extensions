@@ -135,6 +135,6 @@ jobs:
         run: |
           python .github/workflows/create_release_notes.py CHANGELOG.md ${{ github.ref_name }} release_notes.txt
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           body_path: release_notes.txt
