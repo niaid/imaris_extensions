@@ -52,6 +52,12 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.7, "3.10"]
+        exclude: # macos-latest, 14, does not have Python 3.7, so workaround for now
+          - python-version: "3.7"
+            os: macos-latest
+        include: # Run Python 3.7 on older macos
+          - python-version: "3.7"
+            os: macos-13
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
@@ -74,8 +80,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
+      #problems with package hashes when using latest pip so
+      #removed the pip upgrade from the run command below
+      #python -m pip install --upgrade pip
       run: |
-        python -m pip install --upgrade pip
         pip install -r requirements_dev.txt
     - name: Test with pytest
       run: |

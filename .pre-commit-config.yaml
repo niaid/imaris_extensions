@@ -14,7 +14,9 @@ repos:
      args: ['--maxkb=200']
    - id: detect-aws-credentials
      args: ['--allow-missing-credentials'] # allow hook to pass when no credentials are detected
-   - id: detect-private-key    
+   - id: detect-private-key
+   - id: check-json
+   - id: check-yaml
 - repo: https://github.com/psf/black
   rev: 22.12.0
   hooks: # check conformance to black formatting
