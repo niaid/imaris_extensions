@@ -6,6 +6,7 @@ dependencies:
   - pip:
     - SimpleITK == 2.2.1 #last SimpleITK version providing Python 3.7 binaries
     - numpy
+    - scipy
     - pandas
     - h5py>=2.10.0
     - PySide6

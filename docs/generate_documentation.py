@@ -14,6 +14,7 @@ extensions_information = [
         ("../XTVirtualHEStain.py", "VirtualHEStainDialog"),
         ("../XTConfigureChannelSettings.py", "ConfigureChannelSettingsDialog"),
         ("../XTExportChannelSettings.py", "ExportChannelSettingsDialog"),
+        ("../XTColocalizationAnalysis.py", "ColocalizationAnalysisDialog"),
     ]
 ]
 

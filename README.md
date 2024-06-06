@@ -63,7 +63,8 @@ Avoid converting files into imaris format using a network or external drive, thi
   1. [XTRegisterSameChannel](http://niaid.github.io/imaris_extensions/XTRegisterSameChannel.html) - Registration of 2D or 3D images that share a common channel (correlation based affine alignment). Sample datasets are freely available on zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4632320.svg)](https://doi.org/10.5281/zenodo.4632320). A video illustrating the usage of the extension is available on [YouTube](https://www.youtube.com/watch?v=rrCajI8jroE).
   2. [XTChannelArithmetic](http://niaid.github.io/imaris_extensions/XTChannelArithmetic.html) - Perform channel arithmetic, and more advanced channel manipulations via short SimpleITK expressions (short SimpleITK programs).
   3. [XTVirtualHEStain](http://niaid.github.io/imaris_extensions/XTVirtualHEStain.html) - Create a virtual H&E stain from a fluoresence image and add the RGB image as three new channels to the original image.
-  4. More to come.
+  4. [XTColocalizationAnalysis](http://niaid.github.io/imaris_extensions/XTColocalizationAnalysis.html) - Perform colocalization analysis on the set of given images. This extension supports batch analysis and comparison of images and time series.
+  5. More to come.
 
 ### Utilities
   1. [XTConfigureChannelSettings](http://niaid.github.io/imaris_extensions/XTConfigureChannelSettings.html) - Configure channel settings, name, description and visualization configuration specified via a csv file or an Imaris file.
