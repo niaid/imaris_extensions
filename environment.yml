@@ -1,7 +1,5 @@
 name: imaris
 
-channels:
-  - defaults
 dependencies:
   - python=3.7.0 #Python version supported by imaris
   - pip
