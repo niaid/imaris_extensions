@@ -120,6 +120,12 @@ class ChannelArithmeticDialog(ieb.ImarisExtensionBase):
 
             [4] - ([0]*[3])
 
+    #. Duplicate the second channel (indexes are zero based, so second channel index is 1):
+
+        .. code-block:: Python
+
+            [1]
+
     #. Duplicate all channels:
 
         .. code-block:: Python
