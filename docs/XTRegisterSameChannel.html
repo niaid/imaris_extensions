@@ -57,6 +57,7 @@
 <li>Samples per parameter - number of samples used during registration.</li>
 </ol>
 </blockquote>
+<p>When performing registration we usually use the full resolution image, default selection for the "Start registration at resolution" dropdown. When working with large images this may require a significant amount of memory (RAM). When memory resources are constrained, one can try to start the registration at a higher level of the image pyramid, coarser data representation, which requires less memory. Note that the closer one is to the apex of the image pyramid the coarser the data representation which is potentially detrimental to registration accuracy.</p>
 <h2 id="z-stack-registration">z-stack Registration</h2>
 <p>Most of the time you can run the program using the default registration settings.</p>
 <p><strong>Note:</strong> The first registration step, FFT based initialization, requires a significant amount of RAM. On lower end machines (32GB RAM or less) it may not work. This can be ameliorated by disabling this option and enabling the 2D affine initialization step.</p>
