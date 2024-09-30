@@ -168,6 +168,12 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
         6. Auto mask - limit voxels used in registration to non zero voxels.
         7. Samples per parameter - number of samples used during registration.
 
+    When performing registration we usually use the full resolution image, default selection for the
+    "Start registration at resolution" dropdown. When working with large images this may require a significant amount
+    of memory (RAM). When memory resources are constrained, one can try to start the registration at a higher level of
+    the image pyramid, coarser data representation, which requires less memory. Note that the closer one is to the apex
+    of the image pyramid the coarser the data representation which is potentially detrimental to registration accuracy.
+
     z-stack Registration
     ++++++++++++++++++++
 
@@ -827,7 +833,6 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
     def __save_correlation_matrix(
         self, corr_mat, output_file_name, file_name_labels, title=None
     ):
-
         # Create an image from the correlation values, squares with color corrosponding
         # to value, default color map (viridis)
         fig, ax = plt.subplots(figsize=(15, 15))
