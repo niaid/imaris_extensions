@@ -123,6 +123,10 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
     objects. If no expression is provided all of the voxels are used when computing
     the colocalization characteristics.
 
+    One can either type an expression in the "Mask expression" text box or use the "Preset
+    mask expressions" to pre-populate the textbox and then edit it if needed (e.g. setting specific
+    values for thresholds etc.).
+
     The program enables batch colocalization and comparison. When analyzing images (2D or 3D)
     that have a single time-point the output is a single csv file with all of the computed
     charcteristics and a corresponding bar graph. When analyzing images that have multiple time-points
@@ -206,6 +210,22 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
         self.help_dialog.set_rst_text(
             inspect.getdoc(self), pygments_css_file_name="pygments_dark.css"
         )
+
+        # Preset mask expressions that are selectable from dropdown so no
+        # need to type them
+        self.__preset_mask_expressions = {
+            "": "",
+            "Simple threshold (replace t)": "[i] > t",
+            "Otsu threshold": "sitk.OtsuThreshold([i], 0, 1)",
+            "Triangle threshold": "sitk.TriangleThreshold([i], 0, 1, np.iinfo(sitk.GetArrayViewFromImage([i]).dtype).max+1)",  # noqa E501
+            "Huang threshold": "sitk.HuangThreshold([i], 0, 1, np.iinfo(sitk.GetArrayViewFromImage([i]).dtype).max+1)",
+            "Maximum entropy threshold": "sitk.MaximumEntropy([i], 0, 1, np.iinfo(sitk.GetArrayViewFromImage([i]).dtype).max+1)",  # noqa E501
+            "Threshold range (replace t1, t2)": "sitk.BinaryThreshold([i], lowerThreshold=t1, upperThreshold=t2)",
+            "Threshold range and then enlarge the mask to include all voxels that are less than Dnm from it (replace, t1, t2, d)": "sitk.Abs(sitk.SignedMaurerDistanceMap(sitk.BinaryThreshold([i], lowerThreshold=t1, upperThreshold=t2), insideIsPositive=False, squaredDistance=False,useImageSpacing=True)) <= d",  # noqa E501
+            "Rectangular mask (replace x_size, x_start...)": "sitk.Paste([i]*0, sitk.Image([x_size,y_size,z_size],[i].GetPixelID())+1, sourceSize=[x_size,y_size,z_size], sourceIndex=[0,0,0], destinationIndex=[x_start,y_start,z_start])",  # noqa E501
+            "Simple thresholding and get the largest connected component which is larger than minimumObjectSize (replace t, mos)": "sitk.RelabelComponent(sitk.ConnectedComponent([i]>t), minimumObjectSize = mos)==1",  # noqa E501
+            "Simple thresholding and get all connected components that are larger than minimumObjectSize (replace t, mos)": "sitk.RelabelComponent(sitk.ConnectedComponent([i] > t), minimumObjectSize=mos) != 0",  # noqa E501
+        }
 
         self.__create_gui()
         self.setWindowTitle("Colocalization Analysis")
@@ -321,6 +341,19 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
         layout.addWidget(QLabel("Name:"))
         self.a_channel_combo = QComboBox()
         layout.addWidget(self.a_channel_combo)
+        layout.addWidget(QLabel("Preset mask expressions:"))
+        self.a_channel_preset_mask_combo = QComboBox()
+        self.a_channel_preset_mask_combo.addItems(self.__preset_mask_expressions.keys())
+        self.a_channel_preset_mask_combo.currentTextChanged.connect(
+            lambda s: self.__preset_mask_expression_changed(
+                self.a_channel_expression_text_edit, s
+            )
+        )
+        # Add the combobox text strings as tooltips too. Some of them are too long
+        # to fully appear in the combobox.
+        for i, k in enumerate(self.__preset_mask_expressions.keys()):
+            self.a_channel_preset_mask_combo.setItemData(i, k, Qt.ToolTipRole)
+        layout.addWidget(self.a_channel_preset_mask_combo)
         channel_a_layout.addLayout(layout)
         channel_a_layout.addWidget(QLabel("Mask expression:"))
         self.a_channel_expression_text_edit = QTextEdit()
@@ -335,6 +368,19 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
         layout.addWidget(QLabel("Name:"))
         self.b_channel_combo = QComboBox()
         layout.addWidget(self.b_channel_combo)
+        layout.addWidget(QLabel("Preset mask expressions:"))
+        self.b_channel_preset_mask_combo = QComboBox()
+        self.b_channel_preset_mask_combo.addItems(self.__preset_mask_expressions.keys())
+        self.b_channel_preset_mask_combo.currentTextChanged.connect(
+            lambda s: self.__preset_mask_expression_changed(
+                self.b_channel_expression_text_edit, s
+            )
+        )
+        # Add the combobox text strings as tooltips too. Some of them are too long
+        # to fully appear in the combobox.
+        for i, k in enumerate(self.__preset_mask_expressions.keys()):
+            self.b_channel_preset_mask_combo.setItemData(i, k, Qt.ToolTipRole)
+        layout.addWidget(self.b_channel_preset_mask_combo)
         channel_b_layout.addLayout(layout)
         channel_b_layout.addWidget(QLabel("Mask expression:"))
         self.b_channel_expression_text_edit = QTextEdit()
@@ -349,6 +395,21 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
         layout.addWidget(QLabel("Name:"))
         self.roi_channel_combo = QComboBox()
         layout.addWidget(self.roi_channel_combo)
+        layout.addWidget(QLabel("Preset mask expressions:"))
+        self.roi_channel_preset_mask_combo = QComboBox()
+        self.roi_channel_preset_mask_combo.addItems(
+            self.__preset_mask_expressions.keys()
+        )
+        self.roi_channel_preset_mask_combo.currentTextChanged.connect(
+            lambda s: self.__preset_mask_expression_changed(
+                self.roi_channel_expression_text_edit, s
+            )
+        )
+        # Add the combobox text strings as tooltips too. Some of them are too long
+        # to fully appear in the combobox.
+        for i, k in enumerate(self.__preset_mask_expressions.keys()):
+            self.roi_channel_preset_mask_combo.setItemData(i, k, Qt.ToolTipRole)
+        layout.addWidget(self.roi_channel_preset_mask_combo)
         roi_channel_layout.addLayout(layout)
         roi_channel_layout.addWidget(QLabel("Mask expression:"))
         self.roi_channel_expression_text_edit = QTextEdit()
@@ -393,6 +454,9 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
         colocalization_layout.addLayout(layout)
 
         return wid
+
+    def __preset_mask_expression_changed(self, text_edit, expression_description):
+        text_edit.setText(self.__preset_mask_expressions[expression_description])
 
     def __configure_and_show_colocalization_widget(self):
         file_names = self.input_files_edit.toPlainText().split("\n")
