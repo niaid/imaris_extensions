@@ -988,7 +988,7 @@ class ColocalizationCalculator(QRunnable):
             # Pearson and Spearman correlation statistics and associated p-values
             correlation_coefficients = {
                 "Pearson": scipy.stats.pearsonr,
-                "Spearman": scipy.stats.pearsonr,
+                "Spearman": scipy.stats.spearmanr,
             }
             for corr_type, f in correlation_coefficients.items():
                 if ColocalizationCalculator.compute[
