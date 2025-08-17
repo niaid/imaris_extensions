@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="midnight-green.css" />
 </head>
@@ -19,15 +28,40 @@
 <header id="title-block-header">
 <h1 class="title">Virtual H&amp;E Staining</h1>
 </header>
-<p><a href="https://github.com/niaid/imaris_extensions">View on GitHub</a></p>
-<p>This program creates a virtual Hematoxylin and Eosin (H&amp;E) image from a fluorescence microscopy image. Similar to H&amp;E staining, where Hematoxylin stains the cell nuclei and Eosin stains the extracellular matrix and cytoplasm, this program creates a virtual H&amp;E image using a fluorescence channel corresponding to a nuclear stain (e.g. DAPI, Hoechest) and a channel which corresponds to the extracellular matrix and cytoplasm (e.g. Desmin-AF488, CD45-AF532).</p>
+<p><a href="https://github.com/niaid/imaris_extensions">View on
+GitHub</a></p>
+<p>This program creates a virtual Hematoxylin and Eosin (H&amp;E) image
+from a fluorescence microscopy image. Similar to H&amp;E staining, where
+Hematoxylin stains the cell nuclei and Eosin stains the extracellular
+matrix and cytoplasm, this program creates a virtual H&amp;E image using
+a fluorescence channel corresponding to a nuclear stain (e.g. DAPI,
+Hoechest) and a channel which corresponds to the extracellular matrix
+and cytoplasm (e.g. Desmin-AF488, CD45-AF532).</p>
 <p>This is an implementation of the algorithms described in:</p>
 <ol type="1">
-<li>D. S. Gareau, "The feasibility of digitally stained multimodal confocal mosaics to simulate histopathology", J Biomed Opt, 14(3):03405, 2009, <a href="https://doi.org/10.1117/1.3149853">doi: 10.1117/1.3149853</a>.</li>
-<li>M. G. Giacomelli et al., "Virtual Hematoxylin and Eosin Transillumination Microscopy Using Epi-Fluorescence Imaging", PLoS One, 11(8):e0159337 2016, <a href="https://doi.org/10.1371/journal.pone.0159337">doi: 10.1371/journal.pone.0159337</a>.</li>
+<li>D. S. Gareau, "The feasibility of digitally stained multimodal
+confocal mosaics to simulate histopathology", J Biomed Opt, 14(3):03405,
+2009, <a href="https://doi.org/10.1117/1.3149853">doi:
+10.1117/1.3149853</a>.</li>
+<li>M. G. Giacomelli et al., "Virtual Hematoxylin and Eosin
+Transillumination Microscopy Using Epi-Fluorescence Imaging", PLoS One,
+11(8):e0159337 2016, <a
+href="https://doi.org/10.1371/journal.pone.0159337">doi:
+10.1371/journal.pone.0159337</a>.</li>
 </ol>
 <h1 id="inputoutput">Input/Output</h1>
-<p>The program will allow you to create virtual H&amp;E staining for one or more images. You will need to specify which channel to use as a surrogate for Hematoxylin and which for Eosin. Therefore, if you intend to work on a batch of images, the same surrogates for H&amp;E are expected to appear in all of them (channel equivalence is based on the channels having the same name in all the files).</p>
-<p>The program adds three new channels to the original image simulating the RGB colors of an H&amp;E stain. The channels are named "virtual H&amp;E ch1" (red channel), "virtual H&amp;E ch2" (green channel) and "virtual H&amp;E ch3" (blue channel). Note that the channel description for each of these new channels will include the algorithm used to create it and the surrogate H&amp;E channels it utilized. This transparently supports your efforts to conduct reproducible research.</p>
+<p>The program will allow you to create virtual H&amp;E staining for one
+or more images. You will need to specify which channel to use as a
+surrogate for Hematoxylin and which for Eosin. Therefore, if you intend
+to work on a batch of images, the same surrogates for H&amp;E are
+expected to appear in all of them (channel equivalence is based on the
+channels having the same name in all the files).</p>
+<p>The program adds three new channels to the original image simulating
+the RGB colors of an H&amp;E stain. The channels are named "virtual
+H&amp;E ch1" (red channel), "virtual H&amp;E ch2" (green channel) and
+"virtual H&amp;E ch3" (blue channel). Note that the channel description
+for each of these new channels will include the algorithm used to create
+it and the surrogate H&amp;E channels it utilized. This transparently
+supports your efforts to conduct reproducible research.</p>
 </body>
 </html>

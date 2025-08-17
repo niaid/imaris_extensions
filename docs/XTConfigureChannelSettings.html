@@ -8,10 +8,19 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="midnight-green.css" />
 </head>
@@ -19,8 +28,10 @@
 <header id="title-block-header">
 <h1 class="title">Configure Channel Settings</h1>
 </header>
-<p><a href="https://github.com/niaid/imaris_extensions">View on GitHub</a></p>
-<p>This program enables you to configure channel related settings for one or more files. The settings include:</p>
+<p><a href="https://github.com/niaid/imaris_extensions">View on
+GitHub</a></p>
+<p>This program enables you to configure channel related settings for
+one or more files. The settings include:</p>
 <ol type="1">
 <li>channel name</li>
 <li>description</li>
@@ -29,13 +40,23 @@
 <li>range</li>
 <li>gamma</li>
 </ol>
-<p>The user provides a settings file, either a csv file or ims file. The settings from that file are transferred to the new set of files. As the user may be interested in only transferring a subset of the settings found in the settings file, they can select the relevant subset from the program's user interface. The settings file is expected to include at least one of the configurable settings (i.e. a single column csv file), otherwise the program will report an error.</p>
-<p>The contents of a complete configuration, three channel, csv file are displayed below:</p>
+<p>The user provides a settings file, either a csv file or ims file. The
+settings from that file are transferred to the new set of files. As the
+user may be interested in only transferring a subset of the settings
+found in the settings file, they can select the relevant subset from the
+program's user interface. The settings file is expected to include at
+least one of the configurable settings (i.e. a single column csv file),
+otherwise the program will report an error.</p>
+<p>The contents of a complete configuration, three channel, csv file are
+displayed below:</p>
 <pre><code>name,description,color,alpha,range,gamma
 Cytoplasm, first channel description,&quot;0.0, 76.5, 0.0&quot;,1.0,&quot;22.836, 162.388&quot;,1.0
 Nucleus,second channel description,glow_color_table.pal,1.0,&quot;72.272, 158.038&quot;,1.0
 Vesicles,third channel description,&quot;255.0,0.0,0.0&quot;,1.0,&quot;62.164, 150.97&quot;,1.0</code></pre>
-<p>The second channel uses a color table instead of a single color. The file containing the color table is specified using a relative path. The contents of a color table file are triplets, RGB values, in [0,255]. The specific file with 256 entries looks like this:</p>
+<p>The second channel uses a color table instead of a single color. The
+file containing the color table is specified using a relative path. The
+contents of a color table file are triplets, RGB values, in [0,255]. The
+specific file with 256 entries looks like this:</p>
 <pre><code>0.000 0.000 0.000
 0.000 0.000 0.000
 4.080 0.000 0.000
@@ -56,7 +77,13 @@ Vesicles,third channel description,&quot;255.0,0.0,0.0&quot;,1.0,&quot;62.164, 1
 250.920 250.920 243.015
 250.920 250.920 247.095
 255.000 255.000 255.000</code></pre>
-<p>You can export a settings file in csv format from an imaris file using the <a href="http://niaid.github.io/imaris_extensions/XTExportChannelSettings.html">Export Channel Settings extension</a>.</p>
-<p><strong>Note</strong>: If there are fewer channels in the "settings" file, n, than in the file onto which the information is transferred,n&lt;N, the final output dialog will report this after transferring the information to the first n channels.</p>
+<p>You can export a settings file in csv format from an imaris file
+using the <a
+href="http://niaid.github.io/imaris_extensions/XTExportChannelSettings.html">Export
+Channel Settings extension</a>.</p>
+<p><strong>Note</strong>: If there are fewer channels in the "settings"
+file, n, than in the file onto which the information is
+transferred,n&lt;N, the final output dialog will report this after
+transferring the information to the first n channels.</p>
 </body>
 </html>
