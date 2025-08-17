@@ -29,7 +29,7 @@ jobs:
   preliminary_test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python 3.10
       uses: actions/setup-python@v5
       with:
@@ -60,7 +60,7 @@ jobs:
             os: macos-13
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Create LFS file list
       run: |
         git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
@@ -97,7 +97,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
     - name: Set up Python 3.10
@@ -134,7 +134,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
