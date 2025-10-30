@@ -929,9 +929,9 @@ class ColocalizationCalculator(QRunnable):
             shape_stats_filter.ComputeOrientedBoundingBoxOff()
             shape_stats_filter.ComputePerimeterOff()
             shape_stats_filter.Execute(colocalized_cc)
-            current_results[
-                "number of colocalization connected components"
-            ] = shape_stats_filter.GetNumberOfLabels()
+            current_results["number of colocalization connected components"] = (
+                shape_stats_filter.GetNumberOfLabels()
+            )
             current_results[
                 f"connected component sizes ({meta_data[sio.unit_metadata_key]})"
             ] = [
@@ -943,9 +943,9 @@ class ColocalizationCalculator(QRunnable):
                 colocalized_cc
                 * sitk.Cast(image_roi["roi_focus"][1], colocalized_cc.GetPixelID())
             )
-            current_results[
-                "number of colocalization connected components in ROI"
-            ] = shape_stats_filter.GetNumberOfLabels()
+            current_results["number of colocalization connected components in ROI"] = (
+                shape_stats_filter.GetNumberOfLabels()
+            )
             current_results[
                 f"connected component sizes in ROI ({meta_data[sio.unit_metadata_key]})"
             ] = [
@@ -954,16 +954,16 @@ class ColocalizationCalculator(QRunnable):
             ]
 
             if ColocalizationCalculator.compute["percentage image colocalized"]:
-                current_results[
-                    "percentage image colocalized"
-                ] = n_colocalized / np.prod(meta_data["sizes"][0])
+                current_results["percentage image colocalized"] = (
+                    n_colocalized / np.prod(meta_data["sizes"][0])
+                )
             if ColocalizationCalculator.compute["percentage of channel colocalized"]:
-                current_results[
-                    f"percentage of channel [{c_a_name}] colocalized"
-                ] = n_colocalized / np.sum(arr_c_a_roi)
-                current_results[
-                    f"percentage of channel [{c_b_name}] colocalized"
-                ] = n_colocalized / np.sum(arr_c_b_roi)
+                current_results[f"percentage of channel [{c_a_name}] colocalized"] = (
+                    n_colocalized / np.sum(arr_c_a_roi)
+                )
+                current_results[f"percentage of channel [{c_b_name}] colocalized"] = (
+                    n_colocalized / np.sum(arr_c_b_roi)
+                )
             if ColocalizationCalculator.compute["percentage colocalized in ROI"]:
                 current_results["percentage colocalized in ROI"] = np.sum(
                     arr_focused_colocalized
@@ -999,15 +999,13 @@ class ColocalizationCalculator(QRunnable):
                     arr_c_b * arr_c_a_roi
                 ) / np.sum(arr_c_b)
             if ColocalizationCalculator.compute["Manders coefficient in ROI"]:
-                current_results[
-                    f"Manders coefficient channel [{c_a_name}] in ROI"
-                ] = np.sum(arr_c_a * arr_c_b_roi * arr_roi_focus_roi) / np.sum(
-                    arr_c_a * arr_roi_focus_roi
+                current_results[f"Manders coefficient channel [{c_a_name}] in ROI"] = (
+                    np.sum(arr_c_a * arr_c_b_roi * arr_roi_focus_roi)
+                    / np.sum(arr_c_a * arr_roi_focus_roi)
                 )
-                current_results[
-                    f"Manders coefficient channel [{c_b_name}] in ROI"
-                ] = np.sum(arr_c_b * arr_c_a_roi * arr_roi_focus_roi) / np.sum(
-                    arr_c_b * arr_roi_focus_roi
+                current_results[f"Manders coefficient channel [{c_b_name}] in ROI"] = (
+                    np.sum(arr_c_b * arr_c_a_roi * arr_roi_focus_roi)
+                    / np.sum(arr_c_b * arr_roi_focus_roi)
                 )
 
             # Pearson and Spearman correlation statistics and associated p-values
@@ -1071,9 +1069,9 @@ class ColocalizationCalculator(QRunnable):
             channel_info["description"] = channel_description
             # Name the colocalization channel using 1-based channel
             # indexes to match Imaris user expectation.
-            channel_info[
-                "name"
-            ] = f"colocalization of channels {self.c_a+1} and {self.c_b+1}"
+            channel_info["name"] = (
+                f"colocalization of channels {self.c_a+1} and {self.c_b+1}"
+            )
             sitk_c_a_c_b_roi.SetMetaData(
                 sio.channels_metadata_key,
                 sio.channels_information_list2xmlstr([(0, channel_info)]),
@@ -1097,9 +1095,9 @@ class ColocalizationCalculator(QRunnable):
                 channel_info["description"] = channel_description
                 # Name the ROI channel using 1-based channel
                 # indexes to match Imaris user expectation.
-                channel_info[
-                    "name"
-                ] = f"ROI used with colocalization of channels {self.c_a+1} and {self.c_b+1}"
+                channel_info["name"] = (
+                    f"ROI used with colocalization of channels {self.c_a+1} and {self.c_b+1}"
+                )
                 image_roi["roi_focus"][1].SetMetaData(
                     sio.channels_metadata_key,
                     sio.channels_information_list2xmlstr([(0, channel_info)]),

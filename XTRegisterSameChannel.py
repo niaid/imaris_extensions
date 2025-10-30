@@ -642,9 +642,11 @@ class RegisterSameChannelDialog(ieb.ImarisExtensionBase):
             pixel_types.append(sio.supported_pixel_types[metadata["sitk_pixel_type"]])
             image_resolutions.append(len(metadata["sizes"]))
             current_channel_names = [
-                (channel_info["name"].split(channel_prefix_separator)[-1]).strip()
-                if channel_prefix_separator
-                else channel_info["name"]
+                (
+                    (channel_info["name"].split(channel_prefix_separator)[-1]).strip()
+                    if channel_prefix_separator
+                    else channel_info["name"]
+                )
                 for _, channel_info in metadata["channels_information"]
             ]
             self.all_channels.append(

@@ -58,14 +58,12 @@ The metadata dictionary contains the following keys-values:
 </xs:schema>
 """
 
-
 import h5py
 import SimpleITK as sitk
 import numpy as np
 import copy
 import datetime
 import xml.etree.ElementTree as et
-
 
 unit2mm_conversion = {"m": 1000.0, "mm": 1.0, "um": 1.0 / 1000.0, "nm": 1.0 / 1000000.0}
 """Conversion factors between the various units supported by Imaris and mm, which
@@ -498,16 +496,19 @@ def write_channels_metadata(meta_data_dict, file_name, access_mode="a"):
                 # Possibly revisit, using low level h5py API as done for the
                 # attribute writing.
                 try:
-                    f[dataset_info_dirname][channel_str].attrs[
-                        "ColorTable"
-                    ] = np.frombuffer(
-                        (
-                            " ".join(
-                                [f"{v:.3f}" for v in channel_information["color_table"]]
-                            )
-                            + " "
-                        ).encode("UTF-8"),
-                        dtype="S1",
+                    f[dataset_info_dirname][channel_str].attrs["ColorTable"] = (
+                        np.frombuffer(
+                            (
+                                " ".join(
+                                    [
+                                        f"{v:.3f}"
+                                        for v in channel_information["color_table"]
+                                    ]
+                                )
+                                + " "
+                            ).encode("UTF-8"),
+                            dtype="S1",
+                        )
                     )
                 except RuntimeError:
                     f[dataset_info_dirname][channel_str].create_dataset(
@@ -926,9 +927,11 @@ def write(sitk_image, file_name):
         _ims_set_nullterm_str_attribute(
             f[dataset_info_dirname]["TimeInfo"],
             "TimePoint1",
-            sitk_image.GetMetaData(time_metadata_key).encode("UTF-8")
-            if sitk_image.HasMetaDataKey(time_metadata_key)
-            else str(datetime.datetime.now()).encode("UTF-8"),
+            (
+                sitk_image.GetMetaData(time_metadata_key).encode("UTF-8")
+                if sitk_image.HasMetaDataKey(time_metadata_key)
+                else str(datetime.datetime.now()).encode("UTF-8")
+            ),
         )
         f.create_group(dataset_info_dirname + "/Image")
         unit_str = (
