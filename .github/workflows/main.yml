@@ -59,7 +59,7 @@ jobs:
             os: ubuntu-latest
         include: # Run Python 3.7 on older macos and ubuntu
           - python-version: "3.7"
-            os: macos-13
+            os: macos-15-intel
           - python-version: "3.7"
             os: ubuntu-22.04
     runs-on: ${{ matrix.os }}
