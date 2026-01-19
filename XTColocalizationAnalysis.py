@@ -78,14 +78,15 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
     =============================
     `View on GitHub <https://github.com/niaid/imaris_extensions>`_
 
-    This program computes colocalization charecteristics of two channels, optionally
-    using a third channel to define a sub-region of interest. Both the binary image defining
-    the colocalized image region and the Region Of Interest (ROI) binary mask are added to
-    the input image. The channels are named "colocalization of channels A and B" and
+    This program computes colocalization characteristics of two channels, optionally
+    using a third channel to define a sub-region of interest. The binary image defining
+    the colocalized image region is added to the input image. If the binary
+    sub-region of interest isn't the whole image, it is added to the input image too.
+    The channels are named "colocalization of channels A and B" and
     "ROI used with colocalization of channels A and B", where A and B are the original
     channel names. The specific SimpleITK expressions used to create these channels appear
-    in the channel description. The output includes a single or multiple comma-seperated-value
-    file(s) with the values for each of the characteristics. Optinally, corresponding graphs
+    in the channel description. The output includes a single or multiple comma-separated-value
+    file(s) with the values for each of the characteristics. Optionally, corresponding graphs
     are saved using output format(s) selected by the user.
 
     Usage of channel names to identify the channels allows batch processing of images where
@@ -103,11 +104,11 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
 
     The characteristics include (open the settings dialog to select which characteristics to compute, default is all):
 
-    #. Percentage dataset colocalized.
-    #. Percentage of channel colocalized.
-    #. Percentage colocalized in ROI.
-    #. Percentage of material colocalized.
-    #. Percentage of material colocalized in ROI.
+    #. Percentage image colocalized, :math:`\\frac{N_{Colocalized}}{N_{Image}}`.
+    #. Percentage of channel colocalized, :math:`\\frac{N_{Colocalized}}{N_{ChannelSelected}}`.
+    #. Percentage colocalized in ROI, :math:`\\frac{N_{ROIColocalized}}{N_{ROI}}`.
+    #. Percentage of material colocalized, :math:`\\frac{I_{ColocalizedChannelSelected}}{I_{ChannelSelected}}`.
+    #. Percentage of material colocalized in ROI :math:`\\frac{I_{ROIColocalizedChannelSelected}}{I_{ROIChannelSelected}}`.
     #. Manders coefficient.
     #. Manders coefficient in ROI.
     #. Pearson correlation coefficient.
@@ -116,6 +117,23 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
     #. Spearman correlation coefficient.
     #. Spearman correlation coefficient in colocalization.
     #. Spearman correlation coefficient in ROI.
+
+    Where:
+
+    * :math:`N_{Colocalized}` is the number of voxels in the colocalized region.
+    * :math:`N_{Image}` is the total number of voxels in the image.
+    * :math:`N_{ChannelSelected}` is the number of voxels in the selected channel's mask.
+    * :math:`N_{ROIColocalized}` is the number of voxels in the colocalized region that are also in the ROI mask.
+    * :math:`N_{ROI}` is the number of voxels in the ROI mask.
+    * :math:`I_{ColocalizedChannelSelected}` is the sum of intensities in the selected channel in the colocalized region.
+    * :math:`I_{ChannelSelected}` is the sum of intensities in the selected channel's mask.
+    * :math:`I_{ROIColocalizedChannelSelected}` is the sum of intensities in the selected channel in the colocalized region that are also in the ROI mask.
+    * :math:`I_{ROIChannelSelected}` is the sum of intensities in the selected channel's mask in the ROI.
+
+    In addition to the above characteristics, the number and sizes of connected components (objects) that were
+    colocalized is reported for the entire volume and those that are in the ROI. This information is useful to
+    determine if colocalization is occurring in large structures or small ones and if the threshold selections
+    are appropriate, based on the expected number of objects and their sizes.
 
     SimpleITK expressions are used to define binary masks, regions of interest.
     These can be trivial expressions such as simple thresholding or complex
@@ -129,7 +147,7 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
 
     The program enables batch colocalization and comparison. When analyzing images (2D or 3D)
     that have a single time-point the output is a single csv file with all of the computed
-    charcteristics and a corresponding bar graph. When analyzing images that have multiple time-points
+    characteristics and a corresponding bar graph. When analyzing images that have multiple time-points
     the output is a single csv file per input image and a line graph per variable.
 
     Examples of useful expressions
@@ -214,7 +232,7 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
         # Preset mask expressions that are selectable from dropdown so no
         # need to type them
         self.__preset_mask_expressions = {
-            "": "",
+            "No mask (all image)": "",
             "Simple threshold (replace t)": "[i] > t",
             "Otsu threshold": "sitk.OtsuThreshold([i], 0, 1)",
             "Triangle threshold": "sitk.TriangleThreshold([i], 0, 1, np.iinfo(sitk.GetArrayViewFromImage([i]).dtype).max+1)",  # noqa E501
@@ -329,9 +347,6 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
         wid = QWidget(self)
         colocalization_layout = QVBoxLayout()
         wid.setLayout(colocalization_layout)
-
-        # channel_and_expression_layout = QGridLayout()
-        # colocalization_layout.addLayout(channel_and_expression_layout)
 
         channel_a_groupbox = QGroupBox("Channel A")
         channel_a_layout = QVBoxLayout()
@@ -502,6 +517,16 @@ class ColocalizationAnalysisDialog(ieb.ImarisExtensionBase):
                 + "\n".join(list(all_channels.keys()))
             )
             return
+        # Sort the shared channel names according to their indexes in the first file
+        # Most often this is the order across all files and is thus consistent with
+        # what the user is seeing in Imaris and provides for a better user experience.
+        # This makes no difference to the actual extension functionality.
+        shared_channel_name_and_index = [
+            (cname, all_channels[file_names[0]][cname])
+            for cname in shared_channel_names
+        ]
+        shared_channel_name_and_index.sort(key=lambda x: x[1])
+        shared_channel_names = [cname for cname, _ in shared_channel_name_and_index]
 
         # Input directory is set as default output directory which is obtained
         # from the path to the first input file, but only when the output_dir_line_edit
@@ -761,7 +786,7 @@ class ColocalizationCalculatorSignals(QObject):
 
 class ColocalizationCalculator(QRunnable):
     compute = {
-        "percentage dataset colocalized": True,
+        "percentage image colocalized": True,
         "percentage of channel colocalized": True,
         "percentage colocalized in ROI": True,
         "percentage of material colocalized": True,
@@ -928,9 +953,9 @@ class ColocalizationCalculator(QRunnable):
                 for i in range(1, shape_stats_filter.GetNumberOfLabels() + 1)
             ]
 
-            if ColocalizationCalculator.compute["percentage dataset colocalized"]:
+            if ColocalizationCalculator.compute["percentage image colocalized"]:
                 current_results[
-                    "percentage dataset colocalized"
+                    "percentage image colocalized"
                 ] = n_colocalized / np.prod(meta_data["sizes"][0])
             if ColocalizationCalculator.compute["percentage of channel colocalized"]:
                 current_results[
@@ -993,28 +1018,33 @@ class ColocalizationCalculator(QRunnable):
             for corr_type, f in correlation_coefficients.items():
                 if ColocalizationCalculator.compute[
                     f"{corr_type} correlation coefficient"
-                ]:
+                ]:  # pearsonr returns tuple, spearmanr returns an object SpearmanrResult
+                    # treat them uniformly as tuples so that they are written out in the
+                    # same manner.
+                    r, pvalue = f(arr_c_a.ravel(), arr_c_b.ravel())
                     current_results[
                         f"{corr_type} correlation coefficient and p-value channels [{c_a_name}, {c_b_name}]"
-                    ] = f(arr_c_a.ravel(), arr_c_b.ravel())
+                    ] = (r, pvalue)
                 if ColocalizationCalculator.compute[
                     f"{corr_type} correlation coefficient in colocalization"
                 ]:
-                    current_results[
-                        f"{corr_type} correlation coefficient and p-value in colocalization channels [{c_a_name}, {c_b_name}]"  # noqa: E501
-                    ] = f(
+                    r, pvalue = f(
                         arr_c_a[arr_c_a_c_b_roi.astype(bool)],
                         arr_c_b[arr_c_a_c_b_roi.astype(bool)],
                     )
+                    current_results[
+                        f"{corr_type} correlation coefficient and p-value in colocalization channels [{c_a_name}, {c_b_name}]"  # noqa: E501
+                    ] = (r, pvalue)
                 if ColocalizationCalculator.compute[
                     f"{corr_type} correlation coefficient in ROI"
                 ]:
-                    current_results[
-                        f"{corr_type} correlation coefficient and p-value in ROI channels [{c_a_name}, {c_b_name}]"
-                    ] = f(
+                    r, pvalue = f(
                         arr_c_a[arr_roi_focus_roi.astype(bool)],
                         arr_c_b[arr_roi_focus_roi.astype(bool)],
                     )
+                    current_results[
+                        f"{corr_type} correlation coefficient and p-value in ROI channels [{c_a_name}, {c_b_name}]"
+                    ] = (r, pvalue)
             self.results.append(current_results)
 
             # Add colocalization and ROI channels.
@@ -1039,9 +1069,11 @@ class ColocalizationCalculator(QRunnable):
                 + colocalization_expression
             )
             channel_info["description"] = channel_description
+            # Name the colocalization channel using 1-based channel
+            # indexes to match Imaris user expectation.
             channel_info[
                 "name"
-            ] = f"colocalization of channels {self.c_a} and {self.c_b}"
+            ] = f"colocalization of channels {self.c_a+1} and {self.c_b+1}"
             sitk_c_a_c_b_roi.SetMetaData(
                 sio.channels_metadata_key,
                 sio.channels_information_list2xmlstr([(0, channel_info)]),
@@ -1052,51 +1084,36 @@ class ColocalizationCalculator(QRunnable):
             sio.append_channels(
                 sitk_c_a_c_b_roi, self.input_file_name, time_index=time_index
             )
-            roi_expression = (
-                data_info["roi_focus"][1].replace(
+
+            # Only save the ROI channel if it is different from the whole image,
+            # in which case there is a SimpleITK mask expression.
+            if data_info["roi_focus"][1]:
+                roi_expression = data_info["roi_focus"][1].replace(
                     "[i]", f"[{data_info['roi_focus'][0]}]"
                 )
-                if data_info["roi_focus"][1]
-                else f"[{data_info['roi_focus'][0]}]*0+1"
-            )
-            channel_description = (
-                "SimpleITK generated channel from ROI expression: " + roi_expression
-            )
-            channel_info["description"] = channel_description
-            channel_info[
-                "name"
-            ] = f"ROI used with colocalization of channels {self.c_a} and {self.c_b}"
-
-            image_roi["roi_focus"][1].SetMetaData(
-                sio.channels_metadata_key,
-                sio.channels_information_list2xmlstr([(0, channel_info)]),
-            )
-            self.signals.update_state_signal.emit(
-                f"Saving ROI channel ({message_fname})..."
-            )
-            sio.append_channels(
-                image_roi["roi_focus"][1], self.input_file_name, time_index=time_index
-            )
+                channel_description = (
+                    "SimpleITK generated channel from ROI expression: " + roi_expression
+                )
+                channel_info["description"] = channel_description
+                # Name the ROI channel using 1-based channel
+                # indexes to match Imaris user expectation.
+                channel_info[
+                    "name"
+                ] = f"ROI used with colocalization of channels {self.c_a+1} and {self.c_b+1}"
+                image_roi["roi_focus"][1].SetMetaData(
+                    sio.channels_metadata_key,
+                    sio.channels_information_list2xmlstr([(0, channel_info)]),
+                )
+                self.signals.update_state_signal.emit(
+                    f"Saving ROI channel ({message_fname})..."
+                )
+                sio.append_channels(
+                    image_roi["roi_focus"][1],
+                    self.input_file_name,
+                    time_index=time_index,
+                )
             self.signals.progress_signal.emit(int(100 * (time_index + 1) / total_work))
 
 
 if __name__ == "__main__":
     XTColocalizationAnalysis()
-    # cc = ColocalizationCalculator()
-    # for c in cc.compute.keys():
-    #     cc.compute[c] = False
-    # cc.compute["Pearson correlation coefficient in ROI"] = True
-    # cc.input_file_name = (
-    #     "/Users/yanivz/development/microscopy/data/channelArithmetic/ziv1.ims"
-    # )
-    # # channel indexes used in colocalization computations
-    # cc.c_a = 0
-    # cc.c_b = 1
-    # cc.c_roi_focus = 2
-    # # The expression is expected to contain no white space. It is
-    # # the callers responsibility to ensure this.
-    # cc.roi_a_expression = "[i]>20"
-    # cc.roi_b_expression =  "sitk.BinaryThreshold([i], lowerThreshold=50, upperThreshold=150)" #"[i]>10"
-    # cc.roi_focus_expression = "sitk.Paste([i]*0, sitk.Image([30,20,5],[i].GetPixelID())+1,
-    # sourceSize=[30,20,5], sourceIndex=[0,0,0], destinationIndex=[5,5,0])" #"[i]>30"
-    # cc.process_vol_by_vol()
