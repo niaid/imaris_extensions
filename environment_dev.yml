@@ -6,6 +6,7 @@ dependencies:
   - pip:
     - SimpleITK == 2.2.1 #last SimpleITK version providing Python 3.7 binaries
     - numpy
+    - scipy
     - pandas
     - h5py>=2.10.0
     - PySide6
@@ -19,3 +20,4 @@ dependencies:
     - flake8 #only used for development, test code formatting
     - black #only used for development, code formatting
     - pre-commit #only used for development, multi-language pre commit hooks
+    - ipython #only used for development, convinient shell
