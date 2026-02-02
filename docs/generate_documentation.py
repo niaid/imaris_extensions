@@ -61,4 +61,6 @@ with tempfile.TemporaryDirectory() as tmpdirname:
             # update all paths to images and write to file
             fp.write(rst_content.replace("docs/images", "./images"))
             fp.flush()
-            os.system(f"pandoc -s {fp.name} -o {f_name[:-3]}.html -c {css_file_name}")
+            os.system(
+                f"pandoc -s {fp.name} -o {f_name[:-3]}.html -c {css_file_name} --mathjax"
+            )
