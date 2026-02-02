@@ -20,7 +20,6 @@
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
     /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
     pre > code.sourceCode > span { line-height: 1.25; }
@@ -87,6 +86,9 @@
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="midnight-green.css" />
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="/usr/share/javascript/mathjax/MathJax.js"
+  type="text/javascript"></script>
 </head>
 <body>
 <header id="title-block-header">
@@ -137,15 +139,15 @@ Physiol., <a href="https://doi.org/10.1152/ajpcell.00462.2010">doi:
 characteristics to compute, default is all):</p>
 <ol>
 <li>Percentage image colocalized, <span
-class="math inline">$\frac{N_{Colocalized}}{N_{Image}}$</span>.</li>
+class="math inline">\(\frac{N_{Colocalized}}{N_{Image}}\)</span>.</li>
 <li>Percentage of channel colocalized, <span
-class="math inline">$\frac{N_{Colocalized}}{N_{ChannelSelected}}$</span>.</li>
+class="math inline">\(\frac{N_{Colocalized}}{N_{ChannelSelected}}\)</span>.</li>
 <li>Percentage colocalized in ROI, <span
-class="math inline">$\frac{N_{ROIColocalized}}{N_{ROI}}$</span>.</li>
+class="math inline">\(\frac{N_{ROIColocalized}}{N_{ROI}}\)</span>.</li>
 <li>Percentage of material colocalized, <span
-class="math inline">$\frac{I_{ColocalizedChannelSelected}}{I_{ChannelSelected}}$</span>.</li>
+class="math inline">\(\frac{I_{ColocalizedChannelSelected}}{I_{ChannelSelected}}\)</span>.</li>
 <li>Percentage of material colocalized in ROI <span
-class="math inline">$\frac{I_{ROIColocalizedChannelSelected}}{I_{ROIChannelSelected}}$</span>.</li>
+class="math inline">\(\frac{I_{ROIColocalizedChannelSelected}}{I_{ROIChannelSelected}}\)</span>.</li>
 <li>Manders coefficient.</li>
 <li>Manders coefficient in ROI.</li>
 <li>Pearson correlation coefficient.</li>
@@ -157,37 +159,28 @@ class="math inline">$\frac{I_{ROIColocalizedChannelSelected}}{I_{ROIChannelSelec
 </ol>
 <p>Where:</p>
 <ul>
-<li><span
-class="math inline"><em>N</em><sub><em>C</em><em>o</em><em>l</em><em>o</em><em>c</em><em>a</em><em>l</em><em>i</em><em>z</em><em>e</em><em>d</em></sub></span>
-is the number of voxels in the colocalized region.</li>
-<li><span
-class="math inline"><em>N</em><sub><em>I</em><em>m</em><em>a</em><em>g</em><em>e</em></sub></span>
-is the total number of voxels in the image.</li>
-<li><span
-class="math inline"><em>N</em><sub><em>C</em><em>h</em><em>a</em><em>n</em><em>n</em><em>e</em><em>l</em><em>S</em><em>e</em><em>l</em><em>e</em><em>c</em><em>t</em><em>e</em><em>d</em></sub></span>
-is the number of voxels in the selected channel's mask.</li>
-<li><span
-class="math inline"><em>N</em><sub><em>R</em><em>O</em><em>I</em><em>C</em><em>o</em><em>l</em><em>o</em><em>c</em><em>a</em><em>l</em><em>i</em><em>z</em><em>e</em><em>d</em></sub></span>
-is the number of voxels in the colocalized region that are also in the
-ROI mask.</li>
-<li><span
-class="math inline"><em>N</em><sub><em>R</em><em>O</em><em>I</em></sub></span>
-is the number of voxels in the ROI mask.</li>
-<li><span
-class="math inline"><em>I</em><sub><em>C</em><em>o</em><em>l</em><em>o</em><em>c</em><em>a</em><em>l</em><em>i</em><em>z</em><em>e</em><em>d</em><em>C</em><em>h</em><em>a</em><em>n</em><em>n</em><em>e</em><em>l</em><em>S</em><em>e</em><em>l</em><em>e</em><em>c</em><em>t</em><em>e</em><em>d</em></sub></span>
+<li><span class="math inline">\(N_{Colocalized}\)</span> is the number
+of voxels in the colocalized region.</li>
+<li><span class="math inline">\(N_{Image}\)</span> is the total number
+of voxels in the image.</li>
+<li><span class="math inline">\(N_{ChannelSelected}\)</span> is the
+number of voxels in the selected channel's mask.</li>
+<li><span class="math inline">\(N_{ROIColocalized}\)</span> is the
+number of voxels in the colocalized region that are also in the ROI
+mask.</li>
+<li><span class="math inline">\(N_{ROI}\)</span> is the number of voxels
+in the ROI mask.</li>
+<li><span class="math inline">\(I_{ColocalizedChannelSelected}\)</span>
 is the sum of intensities in the selected channel in the colocalized
 region.</li>
+<li><span class="math inline">\(I_{ChannelSelected}\)</span> is the sum
+of intensities in the selected channel's mask.</li>
 <li><span
-class="math inline"><em>I</em><sub><em>C</em><em>h</em><em>a</em><em>n</em><em>n</em><em>e</em><em>l</em><em>S</em><em>e</em><em>l</em><em>e</em><em>c</em><em>t</em><em>e</em><em>d</em></sub></span>
-is the sum of intensities in the selected channel's mask.</li>
-<li><span
-class="math inline"><em>I</em><sub><em>R</em><em>O</em><em>I</em><em>C</em><em>o</em><em>l</em><em>o</em><em>c</em><em>a</em><em>l</em><em>i</em><em>z</em><em>e</em><em>d</em><em>C</em><em>h</em><em>a</em><em>n</em><em>n</em><em>e</em><em>l</em><em>S</em><em>e</em><em>l</em><em>e</em><em>c</em><em>t</em><em>e</em><em>d</em></sub></span>
-is the sum of intensities in the selected channel in the colocalized
-region that are also in the ROI mask.</li>
-<li><span
-class="math inline"><em>I</em><sub><em>R</em><em>O</em><em>I</em><em>C</em><em>h</em><em>a</em><em>n</em><em>n</em><em>e</em><em>l</em><em>S</em><em>e</em><em>l</em><em>e</em><em>c</em><em>t</em><em>e</em><em>d</em></sub></span>
-is the sum of intensities in the selected channel's mask in the
-ROI.</li>
+class="math inline">\(I_{ROIColocalizedChannelSelected}\)</span> is the
+sum of intensities in the selected channel in the colocalized region
+that are also in the ROI mask.</li>
+<li><span class="math inline">\(I_{ROIChannelSelected}\)</span> is the
+sum of intensities in the selected channel's mask in the ROI.</li>
 </ul>
 <p>In addition to the above characteristics, the number and sizes of
 connected components (objects) that were colocalized is reported for the
